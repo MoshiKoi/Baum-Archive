@@ -21,6 +21,7 @@ public class ProjectViewModel : ViewModelBase
     [Reactive]
     public ViewModelBase? Content { get; set; }
 
+    public ReactiveCommand<Unit, Unit> OpenLanguageForestCommand { get; }
     public ReactiveCommand<Language, Unit> OpenLanguageCommand { get; }
     public ReactiveCommand<Unit, Unit> SaveCommand { get; }
 
@@ -31,6 +32,10 @@ public class ProjectViewModel : ViewModelBase
         Database = database;
         SaveFileInfo = file;
         OpenLanguageCommand = ReactiveCommand.Create<Language>(OpenLanguage);
+        OpenLanguageForestCommand = ReactiveCommand.Create(() =>
+        {
+            Content = new LanguageForestViewModel(OpenLanguageCommand, Database);
+        });
         SaveCommand = ReactiveCommand.CreateFromTask(SaveToFile);
         RequestSaveFileInteraction = new();
         Content = new LanguageForestViewModel(OpenLanguageCommand, Database);

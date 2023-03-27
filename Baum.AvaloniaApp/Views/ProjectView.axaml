@@ -1,19 +1,34 @@
 <UserControl
-    xmlns="https://github.com/avaloniaui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:vm="using:Baum.AvaloniaApp.ViewModels"
-    mc:Ignorable="d"
-    d:DesignWidth="800"
-    d:DesignHeight="450"
-    x:Class="Baum.AvaloniaApp.Views.ProjectView"
-    x:DataType="vm:ProjectViewModel">
-   <StackPanel>
-      <Button
-          Command="{Binding SaveCommand}"
-          Content="Save"/>
-      <ContentControl
-          Content="{Binding Content}"/>
-   </StackPanel>
+   xmlns="https://github.com/avaloniaui"
+   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+   xmlns:vm="using:Baum.AvaloniaApp.ViewModels"
+   mc:Ignorable="d"
+   d:DesignWidth="800"
+   d:DesignHeight="450"
+   x:Class="Baum.AvaloniaApp.Views.ProjectView"
+   x:DataType="vm:ProjectViewModel">
+  <DockPanel>
+    <Menu
+       DockPanel.Dock="Top">
+      <MenuItem
+         Header="_File">
+        <MenuItem
+           Header="_Save"
+           Command="{Binding SaveCommand}"/>
+        <Separator/>
+        <MenuItem
+           Header="_Exit"/>
+      </MenuItem>
+      <MenuItem
+         Header="_Goto">
+        <MenuItem
+           Header="_Overview"
+           Command="{Binding OpenLanguageForestCommand}"/>
+      </MenuItem>
+    </Menu>
+    <ContentControl
+       Content="{Binding Content}"/>
+  </DockPanel>
 </UserControl>
