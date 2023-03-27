@@ -1,0 +1,38 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Baum.Phonology", "Baum.Phonology\Baum.Phonology.csproj", "{23CE9414-F739-470C-9ED6-8581A3ACA230}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Baum.Phonology.Tests", "Baum.Phonology.Tests\Baum.Phonology.Tests.csproj", "{D9D77B81-0BC2-46D6-A5BC-D3452590347D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Baum.AvaloniaApp", "Baum.AvaloniaApp\Baum.AvaloniaApp.csproj", "{BA32A7A9-89B4-4700-A50F-0057A1E74AB8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{23CE9414-F739-470C-9ED6-8581A3ACA230}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{23CE9414-F739-470C-9ED6-8581A3ACA230}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{23CE9414-F739-470C-9ED6-8581A3ACA230}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{23CE9414-F739-470C-9ED6-8581A3ACA230}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D9D77B81-0BC2-46D6-A5BC-D3452590347D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D9D77B81-0BC2-46D6-A5BC-D3452590347D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D9D77B81-0BC2-46D6-A5BC-D3452590347D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D9D77B81-0BC2-46D6-A5BC-D3452590347D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F3643DAD-E987-4A4C-B5DE-99ADD5A050BE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F3643DAD-E987-4A4C-B5DE-99ADD5A050BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F3643DAD-E987-4A4C-B5DE-99ADD5A050BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F3643DAD-E987-4A4C-B5DE-99ADD5A050BE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BA32A7A9-89B4-4700-A50F-0057A1E74AB8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BA32A7A9-89B4-4700-A50F-0057A1E74AB8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BA32A7A9-89B4-4700-A50F-0057A1E74AB8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BA32A7A9-89B4-4700-A50F-0057A1E74AB8}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

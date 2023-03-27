@@ -1,0 +1,30 @@
+<UserControl
+   xmlns="https://github.com/avaloniaui"
+   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+   mc:Ignorable="d"
+   d:DesignWidth="800"
+   d:DesignHeight="450"
+   x:Class="Baum.AvaloniaApp.Views.WordView">
+  <Grid
+     RowDefinitions="Auto,Auto"
+     ColumnDefinitions="Auto,Auto">
+    <TextBlock
+       Grid.Row="0"
+       Grid.Column="0"
+       Text="Word"/>
+    <TextBox
+       Grid.Row="0"
+       Grid.Column="1"
+       Text="{Binding Word.Name}"/>
+    <TextBlock
+       Grid.Row="1"
+       Grid.Column="0"
+       Text="IPA"/>
+    <TextBox
+       Grid.Row="1"
+       Grid.Column="1"
+       Text="{Binding Word.IPA}"/>
+  </Grid>
+</UserControl>

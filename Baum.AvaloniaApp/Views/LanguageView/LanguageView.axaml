@@ -1,0 +1,57 @@
+<UserControl
+   xmlns="https://github.com/avaloniaui"
+   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+   xmlns:views="using:Baum.AvaloniaApp.Views"
+   mc:Ignorable="d"
+   d:DesignWidth="800"
+   d:DesignHeight="450"
+   x:Class="Baum.AvaloniaApp.Views.LanguageView">
+  <StackPanel
+     Orientation="Vertical">
+    <TextBox
+       Text="{Binding Language.Name}"/>
+    <TextBlock
+       Text="{Binding Language.Parent.Name}"/>
+    <TextBox
+       Text="{Binding Language.SoundChange}"/>
+    <Grid
+       ColumnDefinitions="*, 4, *">
+      <StackPanel>
+        <Button
+           Command="{Binding AddWordCommand}"
+           Content="Add"/>
+        <ListBox
+           Grid.Column="0"
+           Items="{Binding Words}"
+           SelectedItem="{Binding CurrentWord}">
+          <ListBox.ItemTemplate>
+            <DataTemplate>
+              <StackPanel
+                 Orientation="Horizontal">
+                <TextBlock
+                   Text="{Binding Word.Name}"/>
+                <TextBlock
+                   Text=" Derived from: "
+                   IsVisible="{Binding Word.Parent, Converter={x:Static ObjectConverters.IsNotNull}}"/>
+                <TextBlock
+                   Text="{Binding Word.Parent.Name}"/>
+                <TextBlock
+                   Text="🌿"
+                   IsVisible="{Binding Word.Transient}"/>
+              </StackPanel>
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+      </StackPanel>
+      <GridSplitter
+         Grid.Column="1"
+         Background="Black"
+         ResizeDirection="Columns"/>
+      <ContentControl
+         Grid.Column="2"
+         Content="{Binding CurrentWord}"/>
+    </Grid>
+  </StackPanel>
+</UserControl>

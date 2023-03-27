@@ -1,0 +1,54 @@
+<UserControl
+   xmlns="https://github.com/avaloniaui"
+   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+   mc:Ignorable="d"
+   d:DesignWidth="800"
+   d:DesignHeight="450"
+   x:Class="Baum.AvaloniaApp.Views.LanguageTreeView">
+  <StackPanel
+     Orientation="Vertical"
+     HorizontalAlignment="Center">
+    <Button
+       HorizontalAlignment="Center"
+       Content="{Binding Language.Name}">
+      <Button.Flyout>
+        <Flyout
+           Placement="Bottom">
+          <StackPanel>
+            <TextBlock
+               Text="{Binding Language.Name}"/>
+            <Button
+               Command="{Binding OpenLanguageCommand}"
+               CommandParameter="{Binding Language}"
+               Content="Open"/>
+          </StackPanel>
+        </Flyout>
+      </Button.Flyout>
+    </Button>
+    <Button
+       HorizontalAlignment="Center"
+       Command="{Binding AddChildCommand}"
+       Content="Add Child"/>
+    <ItemsControl
+       HorizontalAlignment="Center"
+       Margin="10"
+       Items="{Binding Children}">
+      <ItemsControl.ItemsPanel>
+        <ItemsPanelTemplate>
+          <StackPanel
+             Orientation="Horizontal"
+             HorizontalAlignment="Center"/>
+        </ItemsPanelTemplate>
+      </ItemsControl.ItemsPanel>
+      <ItemsControl.ItemTemplate>
+        <DataTemplate>
+          <ContentControl
+             Content="{Binding}"
+             HorizontalAlignment="Center"/>
+        </DataTemplate>
+      </ItemsControl.ItemTemplate>
+    </ItemsControl>
+  </StackPanel>
+</UserControl>
