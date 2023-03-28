@@ -13,10 +13,11 @@ public interface IProjectDatabase
 
     void SaveToFile(FileInfo fileInfo);
 
-    Task SaveAsync(Language language);
-    Task<IEnumerable<Language>> GetLanguagesAsync();
-    Task<IEnumerable<Language>> GetChildrenAsync(Language language);
+    Task AddAsync(LanguageModel language);
+    Task UpdateAsync(LanguageModel language);
+    Task<IEnumerable<LanguageModel>> GetLanguagesAsync();
+    Task<IEnumerable<LanguageModel>> GetChildrenAsync(int languageId);
 
-    Task SaveAsync(Word word);
-    Task<IEnumerable<Word>> GetWordsAsync(Language language);
+    Task SaveAsync(WordModel word);
+    Task<IEnumerable<WordModel>> GetWordsAsync(int languageId);
 }

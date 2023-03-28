@@ -2,13 +2,10 @@
 using ReactiveUI.Fody.Helpers;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Baum.AvaloniaApp.Models;
+namespace Baum.AvaloniaApp.Services.Database;
 
-public class Word : ReactiveObject
+public class Word
 {
-    [NotMapped]
-    public bool Transient { get; set; }
-
     public int Id { get; set; }
 
     public int? ParentId { get; set; }
@@ -16,10 +13,8 @@ public class Word : ReactiveObject
     [ForeignKey(nameof(ParentId))]
     public Word? Parent { get; set; }
 
-    [Reactive]
     public required string Name { get; set; }
 
-    [Reactive]
     public required string IPA { get; set; }
 
     public int LanguageId { get; set; }

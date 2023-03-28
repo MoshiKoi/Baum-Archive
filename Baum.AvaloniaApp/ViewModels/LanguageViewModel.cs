@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+using Avalonia.Reactive;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
@@ -15,7 +16,7 @@ public class LanguageViewModel : ViewModelBase
     IProjectDatabase Database { get; set; }
 
     [Reactive]
-    public Language Language { get; set; }
+    public LanguageModel Language { get; set; }
 
     public ObservableCollection<WordViewModel> Words { get; }
 
@@ -23,22 +24,28 @@ public class LanguageViewModel : ViewModelBase
     public WordViewModel? CurrentWord { get; set; }
 
     public ReactiveCommand<Unit, Unit> AddWordCommand { get; }
-    public ReactiveCommand<Language, Unit> SaveCommand { get; }
+    public ReactiveCommand<LanguageModel, Unit> SaveCommand { get; }
 
-    public LanguageViewModel(Language language, IProjectDatabase database)
+    public LanguageViewModel(LanguageModel language, IProjectDatabase database)
     {
         Language = language;
         Words = new();
         Database = database;
         AddWordCommand = ReactiveCommand.CreateFromTask(async () =>
         {
-            await Database.SaveAsync(new Word { Name = "New Word", IPA = "", Language = Language });
+            await Database.SaveAsync(new WordModel
+            {
+                Transient = false,
+                Name = "New Word",
+                IPA = "",
+                LanguageId = Language.Id
+            });
             await LoadAsync();
         });
 
-        SaveCommand = ReactiveCommand.CreateFromTask(async (Language language) =>
+        SaveCommand = ReactiveCommand.CreateFromTask(async (LanguageModel language) =>
         {
-            await Database.SaveAsync(language);
+            await Database.UpdateAsync(language);
             await LoadAsync();
         });
 
@@ -53,7 +60,7 @@ public class LanguageViewModel : ViewModelBase
     public async Task LoadAsync()
     {
         Words.Clear();
-        foreach (var word in await Database.GetWordsAsync(Language))
+        foreach (var word in await Database.GetWordsAsync(Language.Id))
         {
             Words.Add(new(word, Database));
         }

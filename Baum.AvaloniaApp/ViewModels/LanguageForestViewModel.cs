@@ -17,10 +17,10 @@ public class LanguageForestViewModel : ViewModelBase
 
     ObservableCollection<LanguageTreeViewModel> LanguageTrees { get; set; }
 
-    ReactiveCommand<Language, Unit> OpenLanguageCommand { get; }
+    ReactiveCommand<LanguageModel, Unit> OpenLanguageCommand { get; }
     ReactiveCommand<Unit, Unit> AddLanguageCommand { get; }
 
-    public LanguageForestViewModel(ReactiveCommand<Language, Unit> openLanguageCommand, IProjectDatabase database)
+    public LanguageForestViewModel(ReactiveCommand<LanguageModel, Unit> openLanguageCommand, IProjectDatabase database)
     {
         Database = database;
 
@@ -28,7 +28,7 @@ public class LanguageForestViewModel : ViewModelBase
         LanguageTrees = new();
         AddLanguageCommand = ReactiveCommand.CreateFromTask(async () =>
         {
-            await database.SaveAsync(new Language { Name = "Unnamed Language" });
+            await database.AddAsync(new LanguageModel { Name = "Unnamed Language" });
             await LoadAsync();
         });
     }
@@ -37,7 +37,7 @@ public class LanguageForestViewModel : ViewModelBase
     {
         var trees =
             from tree in await Database.GetLanguagesAsync()
-            where tree.Parent == null
+            where tree.ParentId == null
             select tree;
 
         LanguageTrees.Clear();

@@ -11,16 +11,16 @@ namespace Baum.AvaloniaApp.ViewModels;
 public class WordViewModel : ViewModelBase
 {
     [Reactive]
-    public Word Word { get; set; }
+    public WordModel Word { get; set; }
 
-    ReactiveCommand<Word, Unit> SaveCommand { get; }
+    ReactiveCommand<WordModel, Unit> SaveCommand { get; }
 
-    public WordViewModel(Word word, IProjectDatabase database)
+    public WordViewModel(WordModel word, IProjectDatabase database)
     {
         Word = word;
         Database = database;
 
-        SaveCommand = ReactiveCommand.CreateFromTask((Word word) => Database.SaveAsync(word));
+        SaveCommand = ReactiveCommand.CreateFromTask((WordModel word) => Database.SaveAsync(word));
 
         this.WhenAnyValue(
             _ => _.Word,

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 
 using Baum.AvaloniaApp.Models;
+using Baum.AvaloniaApp.Services.Database;
 
 namespace Baum.AvaloniaApp.Services;
 
@@ -15,50 +16,90 @@ class ProjectDatabase : IProjectDatabase
 
     public ProjectDatabase(FileInfo fileInfo) => File = fileInfo;
 
-    public async Task SaveAsync(Language language)
+    public async Task AddAsync(LanguageModel languageModel)
     {
         using var context = new ProjectContext(File);
-        context.Languages.Update(language);
+
+        await context.Languages.AddAsync(new Language
+        {
+            Name = languageModel.Name,
+            ParentId = languageModel.ParentId,
+            SoundChange = languageModel.SoundChange,
+        });
+
         await context.SaveChangesAsync();
     }
 
-    public async Task<IEnumerable<Language>> GetChildrenAsync(Language language)
+    public async Task UpdateAsync(LanguageModel languageModel)
     {
         using var context = new ProjectContext(File);
 
-        var entity = await context.Languages.FindAsync(language.Id);
+        var language = await context.Languages.FindAsync(languageModel.Id);
+        if (language == null) throw new InvalidOperationException("No language found in database");
+
+        language.Name = languageModel.Name;
+        language.SoundChange = languageModel.SoundChange;
+
+        await context.SaveChangesAsync();
+    }
+
+    public async Task<IEnumerable<LanguageModel>> GetChildrenAsync(int languageId)
+    {
+        using var context = new ProjectContext(File);
+
+        var entity = await context.Languages.FindAsync(languageId);
         if (entity == null) throw new InvalidOperationException();
 
-        return await context.Entry(entity)
-            .Collection(l => l.Children)
-            .Query()
-            .Include(l => l.Parent)
-            .AsNoTracking()
-            .ToArrayAsync();
+        return await (
+            from language in context.Languages
+            where language.ParentId == languageId
+            select new LanguageModel
+            {
+                Id = language.Id,
+                Name = language.Name,
+                ParentId = language.ParentId,
+                SoundChange = language.SoundChange,
+            }).ToArrayAsync();
     }
 
-    public async Task<IEnumerable<Language>> GetLanguagesAsync()
+    public async Task<IEnumerable<LanguageModel>> GetLanguagesAsync()
     {
         using var context = new ProjectContext(File);
 
-        return await context.Languages.Include(l => l.Parent).ToArrayAsync();
-    }
-
-    public async Task<IEnumerable<Word>> GetWordsAsync(Language language)
-    {
-        using var context = new ProjectContext(File);
-
-        List<Word> words = new();
-
-        await foreach (var word in context.Words.Where(w => w.LanguageId == language.Id).Include(w => w.Parent).AsAsyncEnumerable())
+        return await context.Languages.Select(l => new LanguageModel
         {
-            word.Transient = false;
-            words.Add(word);
+            Id = l.Id,
+            Name = l.Name,
+            ParentId = l.ParentId,
+            SoundChange = l.SoundChange,
+        }).ToArrayAsync();
+    }
+
+    public async Task<IEnumerable<WordModel>> GetWordsAsync(int languageId)
+    {
+        using var context = new ProjectContext(File);
+
+        var language = await context.Languages.FindAsync(languageId);
+        if (language == null) throw new InvalidOperationException("No language found in database");
+
+        List<WordModel> words = new();
+
+        await foreach (var word in context.Entry(language).Collection(l => l.Words).Query().AsAsyncEnumerable())
+        {
+            words.Add(new WordModel
+            {
+                Transient = false,
+                Id = word.Id,
+                Name = word.Name,
+                IPA = word.IPA,
+                ParentId = word.ParentId,
+                LanguageId = word.LanguageId,
+            });
         }
 
-        if (language.Parent != null)
+        if (language.ParentId != null)
         {
-            var parentWords = await GetWordsAsync(language.Parent);
+            var parentWords = await GetWordsAsync((int)language.ParentId);
             foreach (var parentWord in parentWords)
             {
                 // Skip automatic generation if there exists an existing word inherited
@@ -67,11 +108,11 @@ class ProjectDatabase : IProjectDatabase
                     continue;
                 }
 
-                words.Add(new Word
+                words.Add(new WordModel
                 {
                     Transient = true,
-                    Language = language,
-                    Parent = parentWord,
+                    LanguageId = languageId,
+                    ParentId = parentWord.Id,
                     Name = parentWord.Name,
                     IPA = language.SoundChange != null
                         ? Baum.Phonology.Notation.NotationParser.Parse(language.SoundChange).Apply(parentWord.IPA)
@@ -83,7 +124,7 @@ class ProjectDatabase : IProjectDatabase
         return words;
     }
 
-    public async Task SaveAsync(Word word)
+    public async Task SaveAsync(WordModel word)
     {
         using var context = new ProjectContext(File);
         context.Update(word);
