@@ -55,6 +55,9 @@ public class LanguageViewModel : ViewModelBase
             _ => _.Language.SoundChange,
             (l, _, _) => l)
             .InvokeCommand(SaveCommand);
+
+        this.WhenAnyValue(_ => _.CurrentWord)
+            .InvokeCommand(ReactiveCommand.CreateFromTask(_ => LoadAsync()));
     }
 
     public async Task LoadAsync()

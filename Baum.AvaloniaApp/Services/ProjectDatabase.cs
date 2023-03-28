@@ -102,12 +102,6 @@ class ProjectDatabase : IProjectDatabase
             var parentWords = await GetWordsAsync((int)language.ParentId);
             foreach (var parentWord in parentWords)
             {
-                // Skip automatic generation if there exists an existing word inherited
-                if (words.Exists(w => w.ParentId == parentWord.Id))
-                {
-                    continue;
-                }
-
                 words.Add(new WordModel
                 {
                     Transient = true,
@@ -124,14 +118,14 @@ class ProjectDatabase : IProjectDatabase
         return words;
     }
 
-    public async Task AddAsync(WordModel word)
+    public async Task<WordModel> AddAsync(WordModel word)
     {
         using var context = new ProjectContext(File);
 
         var language = await context.Languages.FindAsync(word.LanguageId);
         if (language == null) throw new InvalidOperationException("Language doesn't exist");
 
-        await context.Words.AddAsync(new Word
+        var entry = await context.Words.AddAsync(new Word
         {
             Language = language,
             Name = word.Name,
@@ -140,6 +134,11 @@ class ProjectDatabase : IProjectDatabase
         });
 
         await context.SaveChangesAsync();
+
+        word.Id = entry.Entity.Id;
+        word.Transient = false;
+
+        return word;
     }
 
     public async Task UpdateAsync(WordModel wordModel)
@@ -152,7 +151,7 @@ class ProjectDatabase : IProjectDatabase
         word.Name = wordModel.Name;
         word.IPA = wordModel.IPA;
         word.ParentId = wordModel.ParentId;
-        
+
         await context.SaveChangesAsync();
     }
 

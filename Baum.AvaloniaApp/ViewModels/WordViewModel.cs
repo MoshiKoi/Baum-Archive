@@ -20,7 +20,13 @@ public class WordViewModel : ViewModelBase
         Word = word;
         Database = database;
 
-        SaveCommand = ReactiveCommand.CreateFromTask((WordModel word) => Database.UpdateAsync(word));
+        SaveCommand = ReactiveCommand.CreateFromTask(async (WordModel word) =>
+        {
+            if (word.Transient)
+                Word = await Database.AddAsync(word);
+            else
+                await Database.UpdateAsync(word);
+        });
 
         this.WhenAnyValue(
             _ => _.Word,

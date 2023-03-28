@@ -18,7 +18,7 @@ public interface IProjectDatabase
     Task<IEnumerable<LanguageModel>> GetLanguagesAsync();
     Task<IEnumerable<LanguageModel>> GetChildrenAsync(int languageId);
 
-    Task AddAsync(WordModel word);
+    Task<WordModel> AddAsync(WordModel word);
     Task UpdateAsync(WordModel word);
     Task<IEnumerable<WordModel>> GetWordsAsync(int languageId);
 }
