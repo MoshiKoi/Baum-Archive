@@ -88,7 +88,7 @@ class ProjectDatabase : IProjectDatabase
             Id = word.Id,
             Name = word.Name,
             IPA = word.IPA,
-            ParentId = word.ParentId,
+            AncestorId = word.AncestorId,
             LanguageId = word.LanguageId,
         };
     }
@@ -111,7 +111,7 @@ class ProjectDatabase : IProjectDatabase
                 Id = word.Id,
                 Name = word.Name,
                 IPA = word.IPA,
-                ParentId = word.ParentId,
+                AncestorId = word.AncestorId,
                 LanguageId = word.LanguageId,
             });
         }
@@ -125,7 +125,7 @@ class ProjectDatabase : IProjectDatabase
                 {
                     Transient = true,
                     LanguageId = languageId,
-                    ParentId = parentWord.Transient ? parentWord.ParentId : parentWord.Id,
+                    AncestorId = parentWord.Transient ? parentWord.AncestorId : parentWord.Id,
                     Name = parentWord.Name,
                     IPA = !string.IsNullOrEmpty(language.SoundChange)
                         ? Baum.Phonology.Notation.NotationParser.Parse(language.SoundChange).Apply(parentWord.IPA)
@@ -141,10 +141,10 @@ class ProjectDatabase : IProjectDatabase
     {
         using var context = new ProjectContext(File);
 
-        if (word.ParentId == null)
+        if (word.AncestorId == null)
             return Enumerable.Empty<WordModel>();
 
-        var ancester = await context.Words.FindAsync(word.ParentId);
+        var ancester = await context.Words.FindAsync(word.AncestorId);
 
         if (ancester == null)
             throw new InvalidOperationException("Ancestor does not exist");
@@ -176,7 +176,7 @@ class ProjectDatabase : IProjectDatabase
         wordChain.Add(new()
         {
             Transient = false,
-            ParentId = ancester.ParentId,
+            AncestorId = ancester.AncestorId,
             LanguageId = ancester.LanguageId,
             Name = ancester.Name,
             IPA = ancester.IPA
@@ -188,7 +188,7 @@ class ProjectDatabase : IProjectDatabase
             wordChain.Add(new WordModel
             {
                 Transient = true,
-                ParentId = ancester.Id,
+                AncestorId = ancester.Id,
                 LanguageId = language.Id,
                 Name = last.Name,
                 IPA = Baum.Phonology.Notation.NotationParser.Parse(language.SoundChange).Apply(last.IPA),
@@ -210,7 +210,7 @@ class ProjectDatabase : IProjectDatabase
             Language = language,
             Name = word.Name,
             IPA = word.IPA,
-            ParentId = word.ParentId,
+            AncestorId = word.AncestorId,
         });
 
         await context.SaveChangesAsync();
@@ -230,7 +230,7 @@ class ProjectDatabase : IProjectDatabase
 
         word.Name = wordModel.Name;
         word.IPA = wordModel.IPA;
-        word.ParentId = wordModel.ParentId;
+        word.AncestorId = wordModel.AncestorId;
 
         await context.SaveChangesAsync();
     }

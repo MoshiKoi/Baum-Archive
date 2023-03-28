@@ -7,7 +7,7 @@ public class WordModel : ReactiveObject
 {
     public required bool Transient { get; set; }
     public int Id { get; set; }
-    public int? ParentId { get; set; }
+    public int? AncestorId { get; set; }
     public required int LanguageId { get; set; }
 
     [Reactive]

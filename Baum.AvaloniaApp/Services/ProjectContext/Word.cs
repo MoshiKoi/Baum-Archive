@@ -8,10 +8,10 @@ public class Word
 {
     public int Id { get; set; }
 
-    public int? ParentId { get; set; }
+    public int? AncestorId { get; set; }
 
-    [ForeignKey(nameof(ParentId))]
-    public Word? Parent { get; set; }
+    [ForeignKey(nameof(AncestorId))]
+    public Word? Ancestor { get; set; }
 
     public required string Name { get; set; }
 
