@@ -114,7 +114,7 @@ class ProjectDatabase : IProjectDatabase
                     LanguageId = languageId,
                     ParentId = parentWord.Id,
                     Name = parentWord.Name,
-                    IPA = language.SoundChange != null
+                    IPA = !string.IsNullOrEmpty(language.SoundChange)
                         ? Baum.Phonology.Notation.NotationParser.Parse(language.SoundChange).Apply(parentWord.IPA)
                         : parentWord.IPA
                 });
