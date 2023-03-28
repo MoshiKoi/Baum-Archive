@@ -75,6 +75,25 @@ class ProjectDatabase : IProjectDatabase
         }).ToArrayAsync();
     }
 
+    async Task<WordModel> GetWordAsync(int wordId)
+    {
+        using var context = new ProjectContext(File);
+
+        var word = await context.Words.FindAsync(wordId);
+        if (word == null) throw new InvalidOperationException("Word doesn't exist");
+
+        return new WordModel
+        {
+            Transient = false,
+            Id = word.Id,
+            Name = word.Name,
+            IPA = word.IPA,
+            ParentId = word.ParentId,
+            LanguageId = word.LanguageId,
+        };
+    }
+
+
     public async Task<IEnumerable<WordModel>> GetWordsAsync(int languageId)
     {
         using var context = new ProjectContext(File);
@@ -106,7 +125,7 @@ class ProjectDatabase : IProjectDatabase
                 {
                     Transient = true,
                     LanguageId = languageId,
-                    ParentId = parentWord.Id,
+                    ParentId = parentWord.Transient ? parentWord.ParentId : parentWord.Id,
                     Name = parentWord.Name,
                     IPA = !string.IsNullOrEmpty(language.SoundChange)
                         ? Baum.Phonology.Notation.NotationParser.Parse(language.SoundChange).Apply(parentWord.IPA)
@@ -116,6 +135,67 @@ class ProjectDatabase : IProjectDatabase
         }
 
         return words;
+    }
+
+    public async Task<IEnumerable<WordModel>> GetAncestryAsync(WordModel word)
+    {
+        using var context = new ProjectContext(File);
+
+        if (word.ParentId == null)
+            return Enumerable.Empty<WordModel>();
+
+        var ancester = await context.Words.FindAsync(word.ParentId);
+
+        if (ancester == null)
+            throw new InvalidOperationException("Ancestor does not exist");
+
+
+        var wordLanguage = await context.Languages.FindAsync(word.LanguageId);
+        if (wordLanguage == null)
+            throw new InvalidOperationException("Language does not exist");
+
+        await context.Entry(wordLanguage)
+            .Reference(l => l.Parent)
+            .LoadAsync();
+
+        List<Language> languageChain = new() { };
+
+        while (wordLanguage.Id != ancester.LanguageId)
+        {
+            if (wordLanguage.SoundChange != null)
+                languageChain.Add(wordLanguage);
+
+            await context.Entry(wordLanguage)
+                .Reference(l => l.Parent)
+                .LoadAsync();
+
+            wordLanguage = wordLanguage.Parent ?? throw new InvalidOperationException("Ancestor is not an ancestor");
+        }
+
+        List<WordModel> wordChain = new();
+        wordChain.Add(new()
+        {
+            Transient = false,
+            ParentId = ancester.ParentId,
+            LanguageId = ancester.LanguageId,
+            Name = ancester.Name,
+            IPA = ancester.IPA
+        });
+
+        foreach (var language in Enumerable.Reverse(languageChain))
+        {
+            var last = wordChain.Last();
+            wordChain.Add(new WordModel
+            {
+                Transient = true,
+                ParentId = ancester.Id,
+                LanguageId = language.Id,
+                Name = last.Name,
+                IPA = Baum.Phonology.Notation.NotationParser.Parse(language.SoundChange).Apply(last.IPA),
+            });
+        }
+
+        return wordChain;
     }
 
     public async Task<WordModel> AddAsync(WordModel word)

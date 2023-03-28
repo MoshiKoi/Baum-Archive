@@ -8,27 +8,46 @@
    d:DesignHeight="450"
    x:Class="Baum.AvaloniaApp.Views.WordView">
   <Grid
-     RowDefinitions="Auto,Auto"
+     RowDefinitions="Auto,Auto,Auto"
      ColumnDefinitions="Auto,Auto">
-    <TextBlock
+    <ItemsControl
        Grid.Row="0"
+       Grid.Column="0"
+       Grid.ColumnSpan="2"
+       Items="{Binding Ancestry}">
+      <ItemsControl.ItemsPanel>
+        <ItemsPanelTemplate>
+          <StackPanel
+             Orientation="Horizontal"/>
+        </ItemsPanelTemplate>
+      </ItemsControl.ItemsPanel>
+      <ItemsControl.ItemTemplate>
+        <DataTemplate>
+          <TextBlock
+             Margin="4"
+             Text="{Binding IPA}"/>
+        </DataTemplate>
+      </ItemsControl.ItemTemplate>
+    </ItemsControl>
+    <TextBlock
+       Grid.Row="1"
        Grid.Column="0"
        Margin="10"
        VerticalAlignment="Center"
        Text="Word"/>
     <TextBox
-       Grid.Row="0"
+       Grid.Row="1"
        Grid.Column="1"
        VerticalAlignment="Center"
        Text="{Binding Word.Name}"/>
     <TextBlock
-       Grid.Row="1"
+       Grid.Row="2"
        Grid.Column="0"
        Margin="10"
        VerticalAlignment="Center"
        Text="IPA"/>
     <TextBox
-       Grid.Row="1"
+       Grid.Row="2"
        Grid.Column="1"
        VerticalAlignment="Center"
        Text="{Binding Word.IPA}"/>

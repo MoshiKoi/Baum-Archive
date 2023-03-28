@@ -57,6 +57,7 @@ public class LanguageViewModel : ViewModelBase
             .InvokeCommand(SaveCommand);
 
         this.WhenAnyValue(_ => _.CurrentWord)
+            .IgnoreElements()
             .InvokeCommand(ReactiveCommand.CreateFromTask(_ => LoadAsync()));
     }
 
