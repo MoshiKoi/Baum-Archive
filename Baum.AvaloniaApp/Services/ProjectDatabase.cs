@@ -124,10 +124,35 @@ class ProjectDatabase : IProjectDatabase
         return words;
     }
 
-    public async Task SaveAsync(WordModel word)
+    public async Task AddAsync(WordModel word)
     {
         using var context = new ProjectContext(File);
-        context.Update(word);
+
+        var language = await context.Languages.FindAsync(word.LanguageId);
+        if (language == null) throw new InvalidOperationException("Language doesn't exist");
+
+        await context.Words.AddAsync(new Word
+        {
+            Language = language,
+            Name = word.Name,
+            IPA = word.IPA,
+            ParentId = word.ParentId,
+        });
+
+        await context.SaveChangesAsync();
+    }
+
+    public async Task UpdateAsync(WordModel wordModel)
+    {
+        using var context = new ProjectContext(File);
+
+        var word = await context.Words.FindAsync(wordModel.Id);
+        if (word == null) throw new InvalidOperationException("Word doesn't exist");
+
+        word.Name = wordModel.Name;
+        word.IPA = wordModel.IPA;
+        word.ParentId = wordModel.ParentId;
+        
         await context.SaveChangesAsync();
     }
 

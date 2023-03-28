@@ -33,7 +33,7 @@ public class LanguageViewModel : ViewModelBase
         Database = database;
         AddWordCommand = ReactiveCommand.CreateFromTask(async () =>
         {
-            await Database.SaveAsync(new WordModel
+            await Database.AddAsync(new WordModel
             {
                 Transient = false,
                 Name = "New Word",
