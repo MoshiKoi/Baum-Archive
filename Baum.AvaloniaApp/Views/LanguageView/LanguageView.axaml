@@ -62,11 +62,6 @@
                 <TextBlock
                    Text="{Binding Word.Name}"/>
                 <TextBlock
-                   Text=" Derived from: "
-                   IsVisible="{Binding Word.Parent, Converter={x:Static ObjectConverters.IsNotNull}}"/>
-                <TextBlock
-                   Text="{Binding Word.Parent.Name}"/>
-                <TextBlock
                    Text="🌿"
                    IsVisible="{Binding Word.Transient}"/>
               </StackPanel>
