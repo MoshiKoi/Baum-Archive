@@ -162,7 +162,7 @@ class ProjectDatabase : IProjectDatabase
 
         while (wordLanguage.Id != ancester.LanguageId)
         {
-            if (wordLanguage.SoundChange != null)
+            if (!string.IsNullOrEmpty(wordLanguage.SoundChange))
                 languageChain.Add(wordLanguage);
 
             await context.Entry(wordLanguage)
@@ -182,16 +182,18 @@ class ProjectDatabase : IProjectDatabase
             IPA = ancester.IPA
         });
 
-        foreach (var language in Enumerable.Reverse(languageChain))
+        foreach (Language intermediate in Enumerable.Reverse(languageChain))
         {
             var last = wordChain.Last();
+            var next = Baum.Phonology.Notation.NotationParser.Parse(intermediate.SoundChange!).Apply(last.IPA);
+            if (last.IPA == next) continue;
             wordChain.Add(new WordModel
             {
                 Transient = true,
                 AncestorId = ancester.Id,
-                LanguageId = language.Id,
+                LanguageId = intermediate.Id,
                 Name = last.Name,
-                IPA = Baum.Phonology.Notation.NotationParser.Parse(language.SoundChange).Apply(last.IPA),
+                IPA = next,
             });
         }
 
