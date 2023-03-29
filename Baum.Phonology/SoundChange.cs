@@ -1,49 +1,53 @@
 ﻿using System.Text;
 using System.Text.RegularExpressions;
 
+using Baum.Phonology.Notation;
+
 namespace Baum.Phonology;
 
 public class SoundChange
 {
-    public abstract record Action;
-    public sealed record InsertAction(IEnumerable<Feature> Features) : Action;
-    public sealed record DeleteAction : Action;
-    public sealed record ChangeAction(IEnumerable<Feature> Included, IEnumerable<Feature> Excluded) : Action;
+    class MatchVisitor : MatchNodeVisitor<bool>
+    {
+        IReadOnlySet<Feature> _features;
+        public MatchVisitor(IReadOnlySet<Feature> features) => _features = features;
+        public bool Visit(FeatureSetMatchNode node)
+            => _features.IsSupersetOf(node.Included) && !_features.Intersect(node.Excluded).Any();
+        public bool Visit(SoundMatchNode node) => _features.SetEquals(node.Features);
+    }
+
+    class ReplaceVisitor : MatchNodeVisitor<IReadOnlySet<Feature>>
+    {
+        IReadOnlySet<Feature> _features;
+        public ReplaceVisitor(IReadOnlySet<Feature> features) => _features = features;
+        public IReadOnlySet<Feature> Visit(FeatureSetMatchNode node)
+            => new HashSet<Feature>(_features.Except(node.Excluded).Union(node.Included));
+
+        public IReadOnlySet<Feature> Visit(SoundMatchNode node) => node.Features;
+    }
 
     public static SoundChange FromString(string rule, PhonologyData data)
-        => new SoundChangeConverter(new(data), data).Convert(Notation.NotationParser.Parse(rule, data));
+    {
+        var node = NotationParser.Parse(rule, data);
+        return new SoundChange
+        {
+            PhonologyData = data,
+            MatchNode = node.Match,
+            Replacement = node.Replace,
+        };
+    }
 
     public required PhonologyData PhonologyData { get; set; }
-    public required Regex Regex;
-    public required List<Action> Actions;
-
+    public required MatchNode MatchNode { get; set; }
+    public required MatchNode Replacement { get; set; }
     public string Apply(string str)
-        => Regex.Replace(str, match =>
-        {
-            var index = 0;
-            var builder = new StringBuilder();
-
-            foreach (var action in Actions)
-            {
-                switch (action)
-                {
-                    case ChangeAction change:
-                        var features = PhonologyData.GetSound(match.ValueSpan[index]).Features
-                            .Except(change.Excluded)
-                            .Union(change.Included);
-
-                        builder.Append(PhonologyData.GetSound(features).Symbol);
-                        ++index;
-                        break;
-                    case InsertAction insert:
-                        builder.Append(PhonologyData.GetSound(insert.Features).Symbol);
-                        break;
-                    case DeleteAction:
-                        ++index;
-                        break;
-                }
-            }
-
-            return builder.ToString();
-        });
+    {
+        return string.Concat(new Tokenization(str, PhonologyData)
+            .Select(sound => ((SoundToken)sound).Features)
+            .Select(features => MatchNode.Accept(new MatchVisitor(features))
+                ? Replacement.Accept(new ReplaceVisitor(features))
+                : features)
+            .Select(PhonologyData.GetSound)
+            .Select(sound => sound.Symbol));
+    }
 }

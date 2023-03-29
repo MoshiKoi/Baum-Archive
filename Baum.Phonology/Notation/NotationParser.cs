@@ -2,26 +2,26 @@ namespace Baum.Phonology.Notation;
 
 public ref struct NotationParser
 {
-
     public static SoundChangeNode Parse(string source, PhonologyData data)
         => new NotationParser(source, data).Parse();
 
-    int _index;
-    ReadOnlySpan<char> _source;
+    IEnumerator<Token> _tokens;
+    bool _isValid;
     PhonologyData _data;
 
-    char CurrentChar => _source[_index];
+    Token? CurrentToken => _isValid ? _tokens.Current : null;
+
     public NotationParser(string source, PhonologyData data)
     {
-        _index = 0;
-        _source = source.AsSpan();
         _data = data;
+        _tokens = new Tokenization(source, data).GetEnumerator();
+        Advance();
     }
 
     public SoundChangeNode Parse()
     {
         var match = NextMatchNode();
-        Consume('>');
+        Consume<DerivationSymbol>();
         var replace = NextPrimary();
 
         return new SoundChangeNode(match, replace);
@@ -43,14 +43,20 @@ public ref struct NotationParser
     //         | FeatureSet
     MatchNode NextPrimary()
     {
-        var result = new SoundMatchNode(_data.GetSound(CurrentChar).Features);
-        Advance();
-        return result;
+        switch (CurrentToken)
+        {
+            case SoundToken token:
+                var result = new SoundMatchNode(token.Features);
+                Advance();
+                return result;
+            default:
+                throw new NotImplementedException();
+        }
     }
 
-    void Consume(char c)
+    void Consume<T>() where T : Token
     {
-        if (_index < _source.Length && CurrentChar == c)
+        if (_tokens.Current is T)
         {
             Advance();
         }
@@ -60,12 +66,5 @@ public ref struct NotationParser
         }
     }
 
-    void Advance()
-    {
-        do
-        {
-            ++_index;
-        }
-        while (_index < _source.Length && char.IsWhiteSpace(_source[_index]));
-    }
+    void Advance() => _isValid = _tokens.MoveNext();
 }
