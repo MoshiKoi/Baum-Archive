@@ -96,7 +96,7 @@ class ProjectDatabase : IProjectDatabase
     }
 
 
-    public async Task<IEnumerable<WordModel>> GetWordsAsync(int languageId)
+    public async Task<IEnumerable<WordModel>> GetWordsAsync(int languageId, PhonologyData data)
     {
         using var context = new ProjectContext(File);
 
@@ -120,7 +120,7 @@ class ProjectDatabase : IProjectDatabase
 
         if (language.ParentId != null)
         {
-            var parentWords = await GetWordsAsync((int)language.ParentId);
+            var parentWords = await GetWordsAsync((int)language.ParentId, data);
             foreach (var parentWord in parentWords)
             {
                 words.Add(new WordModel
@@ -130,7 +130,7 @@ class ProjectDatabase : IProjectDatabase
                     AncestorId = parentWord.Transient ? parentWord.AncestorId : parentWord.Id,
                     Name = parentWord.Name,
                     IPA = !string.IsNullOrEmpty(language.SoundChange)
-                        ? SoundChange.FromString(language.SoundChange, IPA.Data).Apply(parentWord.IPA)
+                        ? SoundChange.FromString(language.SoundChange, data).Apply(parentWord.IPA)
                         : parentWord.IPA
                 });
             }
@@ -139,7 +139,7 @@ class ProjectDatabase : IProjectDatabase
         return words;
     }
 
-    public async Task<IEnumerable<WordModel>> GetAncestryAsync(WordModel word)
+    public async Task<IEnumerable<WordModel>> GetAncestryAsync(WordModel word, PhonologyData data)
     {
         using var context = new ProjectContext(File);
 
@@ -187,7 +187,7 @@ class ProjectDatabase : IProjectDatabase
         foreach (Language intermediate in Enumerable.Reverse(languageChain))
         {
             var last = wordChain.Last();
-            var next = SoundChange.FromString(intermediate.SoundChange!, IPA.Data).Apply(last.IPA);
+            var next = SoundChange.FromString(intermediate.SoundChange!, data).Apply(last.IPA);
             if (last.IPA == next) continue;
             wordChain.Add(new WordModel
             {

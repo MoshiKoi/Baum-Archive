@@ -1,7 +1,12 @@
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+using Avalonia;
+using Avalonia.Platform;
 using Avalonia.Reactive;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
@@ -63,8 +68,23 @@ public class LanguageViewModel : ViewModelBase
 
     public async Task LoadAsync()
     {
+        // TODO: Dependency injection probably
+        var assets = AvaloniaLocator.Current.GetService<IAssetLoader>();
+        List<Phonology.Sound> sounds = new();
+        using (var stream = assets.Open(new Uri("avares://Baum.AvaloniaApp/Assets/ipa-consonants.csv")))
+        {
+            using var reader = new StreamReader(stream);
+            sounds.AddRange(await Phonology.Utils.CsvLoader.LoadAsync(reader));
+        }
+
+        using (var stream = assets.Open(new Uri("avares://Baum.AvaloniaApp/Assets/ipa-vowels.csv")))
+        {
+            using var reader = new StreamReader(stream);
+            sounds.AddRange(await Phonology.Utils.CsvLoader.LoadAsync(reader));
+        }
+
         Words.Clear();
-        foreach (var word in await Database.GetWordsAsync(Language.Id))
+        foreach (var word in await Database.GetWordsAsync(Language.Id, new(sounds)))
         {
             Words.Add(new(word, Database));
         }

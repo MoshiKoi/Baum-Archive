@@ -1,0 +1,108 @@
+Symbol,Place,Method,Voicing
+m̥,bilabial,nasal,
+m,bilabial,nasal,voiced
+ɱ,labiodental,nasal,voiced
+n̼,linguolabial,nasal,voiced
+n̥,alveolar,nasal,
+n,alveolar,nasal,voiced
+ɳ̊,retroflex,nasal,
+ɳ,retroflex,nasal,voiced
+ɲ̊,palatal,nasal,
+ɲ,palatal,nasal,voiced
+ŋ̊,velar,nasal,
+ŋ,velar,nasal,voiced
+ɴ,uvular,nasal,voiced
+p,bilabial,plosive,
+b,bilabial,plosive,voiced
+p̪,labiodental,plosive,
+b̪,labiodental,plosive,voiced
+t̼,linguolabial,plosive,
+d̼,linguolabial,plosive,voiced
+t,alveolar,plosive,
+d,alveolar,plosive,voiced
+ʈ,retroflex,plosive,
+ɖ,retroflex,plosive,voiced
+c,palatal,plosive,
+ɟ,palatal,plosive,voiced
+k,velar,plosive,
+ɡ,velar,plosive,voiced
+q,uvular,plosive,
+ɢ,uvular,plosive,voiced
+ʡ,epiglottal,plosive,
+ʔ,glottal,stop,
+s,alveolar,fricative,
+z,alveolar,fricative,voiced
+ʃ,postalveolar,fricative,
+ʒ,postalveolar,fricative,voiced
+ʂ,retroflex,fricative,
+ʐ,retroflex,fricative,voiced
+ɕ,alveolo-palatal,fricative,
+ʑ,alveolo-palatal,fricative,voiced
+ɸ,bilabial,fricative,
+β,bilabial,fricative,voiced
+f,labiodental,fricative,
+v,labiodental,fricative,voiced
+θ̼,linguolabial,fricative,
+ð̼,linguolabial,fricative,voiced
+θ,dental,fricative,
+ð,dental,fricative,voiced
+θ̠,alveolar,non-sibilant fricative,
+ð̠,alveolar,non-sibilant fricative,voiced
+ɹ̠̊˔,postalveolar,non-sibilant fricative,
+ɹ̠˔,postalveolar,non-sibilant fricative,voiced
+ɻ̊˔,retroflex,non-sibilant fricative,
+ɻ˔,retroflex,non-sibilant fricative,voiced
+ç,palatal,fricative,
+ʝ,palatal,fricative,voiced
+x,velar,fricative,
+ɣ,velar,fricative,voiced
+χ,uvular,fricative,
+ʁ,uvular,fricative,voiced
+ħ,pharyngeal,fricative,
+ʕ,pharyngeal,fricative,voiced
+h,glottal,fricative,
+ɦ,glottal,fricative,voiced
+ʋ,labiodental,approximant,voiced
+ɹ,alveolar,approximant,voiced
+ɻ,retroflex,approximant,voiced
+j,palatal,approximant,voiced
+ɰ,velar,approximant,voiced
+ʔ̞,creaky-glottal,approximant,
+ⱱ̟,bilabial,flap,voiced
+ⱱ,labiodental,flap,voiced
+ɾ̼,linguolabial,tap,voiced
+ɾ̥,alveolar,tap,
+ɾ,dental,and alveolar taps and flaps,voiced
+ɽ̊,retroflex,flap,
+ɽ,retroflex,flap,voiced
+ɢ̆,uvular,tap and flap,voiced
+ʡ̆,epiglottal,tap,voiced
+ʙ̥,bilabial,trill,
+ʙ,bilabial,trill,voiced
+r̥,alveolar,trill,
+r,alveolar,trill,voiced
+ɽ̊r̥,retroflex,trill,
+ɽr,retroflex,trill,voiced
+ʀ̥,uvular,trill,
+ʀ,uvular,trill,voiced
+ʜ,epiglottal,trill,
+ʢ,epiglottal,trill,voiced
+ɬ,alveolar,lateral fricative,
+ɮ,alveolar,lateral fricative,voiced
+ꞎ,retroflex,lateral fricative,
+ɭ˔,retroflex,lateral fricative,voiced
+𝼆,palatal,lateral fricative,
+ʎ̝,palatal,lateral fricative,voiced
+𝼄,velar,lateral fricative,
+ʟ̝,velar,lateral fricative,voiced
+l,alveolar,lateral approximant,voiced
+ɭ,retroflex,lateral approximant,voiced
+ʎ,palatal,lateral approximant,voiced
+ʟ,velar,lateral approximant,voiced
+ʟ̠,uvular,lateral approximant,voiced
+ɺ̥,alveolar,lateral flap,
+ɺ,alveolar,lateral flap,voiced
+𝼈̥,retroflex,lateral flap,
+𝼈,retroflex,lateral flap,voiced
+ʎ̆,palatal,lateral flap,voiced
+ʟ̆,velar,lateral tap,voiced

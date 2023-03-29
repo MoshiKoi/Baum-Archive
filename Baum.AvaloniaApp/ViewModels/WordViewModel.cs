@@ -1,7 +1,12 @@
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Linq;
+using Avalonia;
+using Avalonia.Platform;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
@@ -44,8 +49,21 @@ public class WordViewModel : ViewModelBase
         this.WhenAnyValue(_ => _.Word)
             .InvokeCommand(ReactiveCommand.CreateFromTask(async (WordModel word) =>
             {
+                var assets = AvaloniaLocator.Current.GetService<IAssetLoader>();
+                List<Phonology.Sound> sounds = new();
+                using (var stream = assets.Open(new Uri("avares://Baum.AvaloniaApp/Assets/ipa-consonants.csv")))
+                {
+                    using var reader = new StreamReader(stream);
+                    sounds.AddRange(await Phonology.Utils.CsvLoader.LoadAsync(reader));
+                }
+
+                using (var stream = assets.Open(new Uri("avares://Baum.AvaloniaApp/Assets/ipa-vowels.csv")))
+                {
+                    using var reader = new StreamReader(stream);
+                    sounds.AddRange(await Phonology.Utils.CsvLoader.LoadAsync(reader));
+                }
                 Ancestry.Clear();
-                foreach (var ancestor in await Database.GetAncestryAsync(word))
+                foreach (var ancestor in await Database.GetAncestryAsync(word, new(sounds)))
                 {
                     Ancestry.Add(ancestor);
                 }

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 
+using Baum.Phonology;
 using Baum.AvaloniaApp.Models;
 
 namespace Baum.AvaloniaApp.Services;
@@ -20,6 +21,6 @@ public interface IProjectDatabase
 
     Task<WordModel> AddAsync(WordModel word);
     Task UpdateAsync(WordModel word);
-    Task<IEnumerable<WordModel>> GetWordsAsync(int languageId);
-    Task<IEnumerable<WordModel>> GetAncestryAsync(WordModel word);
+    Task<IEnumerable<WordModel>> GetWordsAsync(int languageId, PhonologyData data);
+    Task<IEnumerable<WordModel>> GetAncestryAsync(WordModel word, PhonologyData data);
 }
