@@ -3,17 +3,19 @@ using System.Text.RegularExpressions;
 
 namespace Baum.Phonology;
 
-public enum Action
-{
-    Insert,
-    Delete,
-    Change,
-}
-
 public class SoundChange
 {
+    public abstract record Action;
+    public sealed record InsertAction(IEnumerable<Feature> Features) : Action;
+    public sealed record DeleteAction : Action;
+    public sealed record ChangeAction(IEnumerable<Feature> Included, IEnumerable<Feature> Excluded) : Action;
+
+    public static SoundChange FromString(string rule, PhonologyData data)
+        => new SoundChangeConverter(new(data), data).Convert(Notation.NotationParser.Parse(rule, data));
+
+    public required PhonologyData PhonologyData { get; set; }
     public required Regex Regex;
-    public required List<(Action action, Features additions, Features subtractions)> Actions;
+    public required List<Action> Actions;
 
     public string Apply(string str)
         => Regex.Replace(str, match =>
@@ -23,18 +25,20 @@ public class SoundChange
 
             foreach (var action in Actions)
             {
-                switch (action.action)
+                switch (action)
                 {
-                    case Action.Change:
-                        builder.Append(IPA.ToIPA(IPA.FromIPA(match.ValueSpan[index])
-                            .Without(action.subtractions)
-                            .With(action.additions)));
+                    case ChangeAction change:
+                        var features = PhonologyData.GetSound(match.ValueSpan[index]).Features
+                            .Except(change.Excluded)
+                            .Union(change.Included);
+
+                        builder.Append(PhonologyData.GetSound(features).Symbol);
                         ++index;
                         break;
-                    case Action.Insert:
-                        builder.Append(IPA.ToIPA(action.additions));
+                    case InsertAction insert:
+                        builder.Append(PhonologyData.GetSound(insert.Features).Symbol);
                         break;
-                    case Action.Delete:
+                    case DeleteAction:
                         ++index;
                         break;
                 }

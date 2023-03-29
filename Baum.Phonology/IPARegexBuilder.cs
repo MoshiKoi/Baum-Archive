@@ -1,13 +1,19 @@
-namespace Baum.Phonology;
+namespace Baum.Phonology.Notation;
 
 public class IPARegexBuilder : MatchNodeVisitor<string>
 {
-    public static readonly IPARegexBuilder Instance = new();
+    PhonologyData PhonologyData { get; }
+
+    public IPARegexBuilder(PhonologyData data) => PhonologyData = data;
+
     public string Visit(FeatureSetMatchNode node)
     {
-        return '[' + String.Concat(
-            from keyValuePair in IPA.IPADict
-            where keyValuePair.Value.HasFlag(node.Included) && ((keyValuePair.Value & node.Excluded) == Features.None)
-            select keyValuePair.Key) + ']';
+        var symbols = PhonologyData
+                .GetSounds(node.Included, node.Excluded)
+                .Select(sound => sound.Symbol);
+
+        return '[' + String.Concat(symbols) + ']';
     }
+
+    public string Visit(SoundMatchNode node) => PhonologyData.GetSound(node.Features).Symbol.ToString();
 }

@@ -5,6 +5,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 
+using Baum.Phonology;
+using Baum.Phonology.Notation;
 using Baum.AvaloniaApp.Models;
 using Baum.AvaloniaApp.Services.Database;
 
@@ -128,7 +130,7 @@ class ProjectDatabase : IProjectDatabase
                     AncestorId = parentWord.Transient ? parentWord.AncestorId : parentWord.Id,
                     Name = parentWord.Name,
                     IPA = !string.IsNullOrEmpty(language.SoundChange)
-                        ? Baum.Phonology.Notation.NotationParser.Parse(language.SoundChange).Apply(parentWord.IPA)
+                        ? SoundChange.FromString(language.SoundChange, IPA.Data).Apply(parentWord.IPA)
                         : parentWord.IPA
                 });
             }
@@ -185,7 +187,7 @@ class ProjectDatabase : IProjectDatabase
         foreach (Language intermediate in Enumerable.Reverse(languageChain))
         {
             var last = wordChain.Last();
-            var next = Baum.Phonology.Notation.NotationParser.Parse(intermediate.SoundChange!).Apply(last.IPA);
+            var next = SoundChange.FromString(intermediate.SoundChange!, IPA.Data).Apply(last.IPA);
             if (last.IPA == next) continue;
             wordChain.Add(new WordModel
             {

@@ -2,22 +2,14 @@ namespace Baum.Phonology;
 
 public static class IPA
 {
-    public static readonly Dictionary<char, Features> IPADict = new()
+    public static readonly PhonologyData Data = new(new Sound[]
     {
-        {'p', Features.Pulmonic},
-        {'b', Features.Pulmonic | Features.Voiced},
-        {'f', Features.Fricative},
-        {'v', Features.Fricative | Features.Voiced},
+        new('p', new HashSet<Feature>() { new("pulmonic") }),
+        new('b', new HashSet<Feature>() { new("pulmonic"), new("voiced") }),
+        new('f', new HashSet<Feature>() { new("fricative") }),
+        new('v', new HashSet<Feature>() { new("fricative"), new("voiced") }),
 
-        {'a', Features.Vowel | Features.Front | Features.Open},
-        {'e', Features.Vowel | Features.Front | Features.CloseMid}
-    };
-
-    public static Features FromIPA(char symbol) => IPA.IPADict[symbol];
-
-    public static char ToIPA(Features features)
-        => Enumerable.Single(
-            from keyValuePair in IPADict
-            where keyValuePair.Value == features
-            select keyValuePair.Key);
+        new('a', new HashSet<Feature>() { new("vowel"),  new("front"), new("open") }),
+        new('e', new HashSet<Feature>() { new("vowel"),  new("front"), new("close-mid") })
+    });
 }

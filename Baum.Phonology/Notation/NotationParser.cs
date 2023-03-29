@@ -3,30 +3,28 @@ namespace Baum.Phonology.Notation;
 public ref struct NotationParser
 {
 
-    public static SoundChange Parse(string source)
-        => new NotationParser(source).Parse();
+    public static SoundChangeNode Parse(string source, PhonologyData data)
+        => new NotationParser(source, data).Parse();
 
     int _index;
     ReadOnlySpan<char> _source;
+    PhonologyData _data;
 
     char CurrentChar => _source[_index];
-    public NotationParser(string source)
+    public NotationParser(string source, PhonologyData data)
     {
         _index = 0;
         _source = source.AsSpan();
+        _data = data;
     }
 
-    public SoundChange Parse()
+    public SoundChangeNode Parse()
     {
         var match = NextMatchNode();
         Consume('>');
         var replace = NextPrimary();
 
-        return new SoundChange
-        {
-            Regex = new(match.Accept(IPARegexBuilder.Instance)),
-            Actions = new() { (Action.Change, replace.Included, replace.Excluded) }
-        };
+        return new SoundChangeNode(match, replace);
     }
 
     MatchNode NextMatchSequence()
@@ -43,9 +41,9 @@ public ref struct NotationParser
 
     // Primary : IPASymbol
     //         | FeatureSet
-    FeatureSetMatchNode NextPrimary()
+    MatchNode NextPrimary()
     {
-        var result = FeatureSetMatchNode.ExactMatch(IPA.FromIPA(CurrentChar));
+        var result = new SoundMatchNode(_data.GetSound(CurrentChar).Features);
         Advance();
         return result;
     }
