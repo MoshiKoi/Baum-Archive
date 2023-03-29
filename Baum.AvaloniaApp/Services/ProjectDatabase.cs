@@ -123,15 +123,25 @@ class ProjectDatabase : IProjectDatabase
             var parentWords = await GetWordsAsync((int)language.ParentId, data);
             foreach (var parentWord in parentWords)
             {
+                string IPA;
+                try
+                {
+                    IPA = !string.IsNullOrEmpty(language.SoundChange)
+                        ? SoundChange.FromString(language.SoundChange, data).Apply(parentWord.IPA)
+                        : parentWord.IPA;
+                }
+                catch //TODO! Specialize the Exception
+                {
+                    // TODO? Possibly do some error handling or notification here instead of just skipping
+                    continue;
+                }
                 words.Add(new WordModel
                 {
                     Transient = true,
                     LanguageId = languageId,
                     AncestorId = parentWord.Transient ? parentWord.AncestorId : parentWord.Id,
                     Name = parentWord.Name,
-                    IPA = !string.IsNullOrEmpty(language.SoundChange)
-                        ? SoundChange.FromString(language.SoundChange, data).Apply(parentWord.IPA)
-                        : parentWord.IPA
+                    IPA = IPA
                 });
             }
         }
@@ -187,7 +197,16 @@ class ProjectDatabase : IProjectDatabase
         foreach (Language intermediate in Enumerable.Reverse(languageChain))
         {
             var last = wordChain.Last();
-            var next = SoundChange.FromString(intermediate.SoundChange!, data).Apply(last.IPA);
+            string next;
+            try
+            {
+                next = SoundChange.FromString(intermediate.SoundChange!, data).Apply(last.IPA);
+            }
+            catch //TODO! Specialize the Exception
+            {
+                // TODO? Possibly do some error handling or notification here instead of just skipping
+                continue;
+            }
             if (last.IPA == next) continue;
             wordChain.Add(new WordModel
             {
