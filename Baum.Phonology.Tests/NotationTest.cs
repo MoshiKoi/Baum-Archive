@@ -19,7 +19,6 @@ public class NotationTest
     [InlineData("a>e", "pam", "pem")]
     public void SimpleNotationPasses(string rule, string initial, string expected)
     {
-        var regexBuilder = new IPARegexBuilder(stubData);
         var soundChange = SoundChange.FromString(rule, stubData);
         
         var result = soundChange.Apply(initial);
