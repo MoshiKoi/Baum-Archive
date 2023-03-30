@@ -9,6 +9,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Baum.Phonology.Tests", "Bau
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Baum.AvaloniaApp", "Baum.AvaloniaApp\Baum.AvaloniaApp.csproj", "{BA32A7A9-89B4-4700-A50F-0057A1E74AB8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Baum.Rewrite", "Baum.Rewrite\Baum.Rewrite.csproj", "{9D05D107-156B-4949-86FE-B3C8AA3CB0B4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Baum.Rewrite.Tests", "Baum.Rewrite.Tests\Baum.Rewrite.Tests.csproj", "{51936B52-11DD-4AF1-9793-BFF1C54DF025}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -34,5 +38,13 @@ Global
 		{BA32A7A9-89B4-4700-A50F-0057A1E74AB8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BA32A7A9-89B4-4700-A50F-0057A1E74AB8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BA32A7A9-89B4-4700-A50F-0057A1E74AB8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9D05D107-156B-4949-86FE-B3C8AA3CB0B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9D05D107-156B-4949-86FE-B3C8AA3CB0B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9D05D107-156B-4949-86FE-B3C8AA3CB0B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9D05D107-156B-4949-86FE-B3C8AA3CB0B4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{51936B52-11DD-4AF1-9793-BFF1C54DF025}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{51936B52-11DD-4AF1-9793-BFF1C54DF025}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{51936B52-11DD-4AF1-9793-BFF1C54DF025}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{51936B52-11DD-4AF1-9793-BFF1C54DF025}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
