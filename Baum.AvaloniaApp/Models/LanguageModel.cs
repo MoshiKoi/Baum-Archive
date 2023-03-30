@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
@@ -14,5 +14,5 @@ public class LanguageModel : ReactiveObject
     public int? ParentId { get; set; }
 
     [Reactive]
-    public string? SoundChange { get; set; }
+    public string SoundChange { get; set; } = "";
 }
