@@ -1,8 +1,5 @@
 using System.Collections.ObjectModel;
-using System.Linq;
-using System;
 using System.Reactive;
-using System.Reactive.Linq;
 using System.Threading.Tasks;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;

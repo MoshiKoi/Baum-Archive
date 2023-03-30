@@ -1,5 +1,3 @@
-using Baum.Phonology.Notation;
-
 namespace Baum.Phonology.Tests;
 
 public class FeatureSetTest

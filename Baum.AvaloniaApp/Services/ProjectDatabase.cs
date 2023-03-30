@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 
 using Baum.Phonology;
-using Baum.Phonology.Notation;
 using Baum.AvaloniaApp.Models;
 using Baum.AvaloniaApp.Services.Database;
 

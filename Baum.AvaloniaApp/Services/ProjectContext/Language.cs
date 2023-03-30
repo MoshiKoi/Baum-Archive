@@ -1,7 +1,5 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 
 namespace Baum.AvaloniaApp.Services.Database;
 

@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 

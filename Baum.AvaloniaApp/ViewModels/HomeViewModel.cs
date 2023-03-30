@@ -1,8 +1,4 @@
-using System;
-using System.IO;
 using System.Reactive;
-using System.Reactive.Linq;
-using System.Threading.Tasks;
 using ReactiveUI;
 
 namespace Baum.AvaloniaApp.ViewModels;
