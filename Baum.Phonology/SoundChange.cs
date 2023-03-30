@@ -1,7 +1,4 @@
-﻿using System.Text;
-using System.Text.RegularExpressions;
-
-using Baum.Phonology.Notation;
+﻿using Baum.Phonology.Notation;
 
 namespace Baum.Phonology;
 
@@ -26,15 +23,26 @@ public class SoundChange
         public IReadOnlySet<Feature> Visit(SoundMatchNode node) => node.Features;
     }
 
-    public static SoundChange FromString(string rule, PhonologyData data)
+    public static bool TryApply(string initial, string rule, PhonologyData data, out string after)
     {
-        var node = NotationParser.Parse(rule, data);
-        return new SoundChange
+        try
         {
-            PhonologyData = data,
-            MatchNode = node.Match,
-            Replacement = node.Replace,
-        };
+            var node = NotationParser.Parse(rule, data);
+            var change = new SoundChange
+            {
+                PhonologyData = data,
+                MatchNode = node.Match,
+                Replacement = node.Replace,
+            };
+
+            after = change.Apply(initial);
+            return true;
+        }
+        catch (Exception) // TODO: Specialize exception
+        {
+            after = initial;
+            return false;
+        }
     }
 
     public required PhonologyData PhonologyData { get; set; }

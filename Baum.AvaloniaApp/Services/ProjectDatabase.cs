@@ -123,18 +123,8 @@ class ProjectDatabase : IProjectDatabase
             var parentWords = await GetWordsAsync((int)language.ParentId, data);
             foreach (var parentWord in parentWords)
             {
-                string IPA;
-                try
-                {
-                    IPA = !string.IsNullOrEmpty(language.SoundChange)
-                        ? SoundChange.FromString(language.SoundChange, data).Apply(parentWord.IPA)
-                        : parentWord.IPA;
-                }
-                catch //TODO! Specialize the Exception
-                {
-                    // TODO? Possibly do some error handling or notification here instead of just skipping
-                    continue;
-                }
+                SoundChange.TryApply(parentWord.IPA, language.SoundChange, data, out var IPA);
+
                 words.Add(new WordModel
                 {
                     Transient = true,
@@ -197,16 +187,10 @@ class ProjectDatabase : IProjectDatabase
         foreach (Language intermediate in Enumerable.Reverse(languageChain))
         {
             var last = wordChain.Last();
-            string next;
-            try
-            {
-                next = SoundChange.FromString(intermediate.SoundChange!, data).Apply(last.IPA);
-            }
-            catch //TODO! Specialize the Exception
-            {
-                // TODO? Possibly do some error handling or notification here instead of just skipping
-                continue;
-            }
+
+            SoundChange.TryApply(last.IPA, intermediate.SoundChange, data, out var next);
+
+            // TODO? Possibly do some error handling or notification here instead of just skipping
             if (last.IPA == next) continue;
             wordChain.Add(new WordModel
             {

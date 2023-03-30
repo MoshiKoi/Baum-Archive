@@ -19,10 +19,7 @@ public class NotationTest
     [InlineData("a>e", "pam", "pem")]
     public void SimpleNotationPasses(string rule, string initial, string expected)
     {
-        var soundChange = SoundChange.FromString(rule, stubData);
-        
-        var result = soundChange.Apply(initial);
-
+        Assert.True(SoundChange.TryApply(initial, rule, stubData, out var result));
         Assert.Equal(expected, result);
     }
 }

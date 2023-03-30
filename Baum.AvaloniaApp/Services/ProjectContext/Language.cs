@@ -11,7 +11,7 @@ public class Language
 
     public string? Name { get; set; }
     public List<Word> Words { get; set; } = new();
-    public string? SoundChange { get; set; }
+    public string SoundChange { get; set; } = "";
 
     public int? ParentId { get; set; }
     public Language? Parent { get; set; }
