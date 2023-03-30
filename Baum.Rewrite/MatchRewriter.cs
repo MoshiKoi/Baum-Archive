@@ -5,13 +5,21 @@ namespace Baum.Rewrite;
 public class MatchRewriter<T> : IRewriter<T>
 {
     Predicate<T> Match;
-    Func<T, T> Replace;
+    Func<T, IEnumerable<T>> Replace;
 
-    public MatchRewriter(T match) : this(x => object.Equals(x, match)) { }
-    public MatchRewriter(Predicate<T> match) : this(match, x => x) { }
-    public MatchRewriter(T match, T replacement) : this(x => object.Equals(x, match), x => replacement) { }
-    public MatchRewriter(Predicate<T> match, T replacement) : this(match, x => replacement) { }
-    public MatchRewriter(Predicate<T> match, Func<T, T> replace)
+    public MatchRewriter(T match)
+        : this(x => object.Equals(x, match)) { }
+
+    public MatchRewriter(Predicate<T> match)
+        : this(match, x => new[] { x }) { }
+
+    public MatchRewriter(T match, IEnumerable<T> replacement)
+        : this(x => object.Equals(x, match), x => replacement) { }
+
+    public MatchRewriter(Predicate<T> match, IEnumerable<T> replacement)
+        : this(match, x => replacement) { }
+
+    public MatchRewriter(Predicate<T> match, Func<T, IEnumerable<T>> replace)
         => (Match, Replace) = (match, replace);
 
 
@@ -22,7 +30,7 @@ public class MatchRewriter<T> : IRewriter<T>
         {
             return new RewritePair<T>[] {
                 new RewritePair<T> {
-                    Rewrite = new [] { Replace(element) },
+                    Rewrite = Replace(element),
                     RewritePosition = startPosition + 1
                 }
             };

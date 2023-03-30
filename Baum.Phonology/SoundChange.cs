@@ -36,9 +36,12 @@ public class SoundChange
 
         // TODO: Not quite sure if this algorithm is actually the best way to do this
         // Replaces every match in the string
-        int len = featureString.Count();
-        for (int pos = 0; pos < len; ++pos)
+        int maxLength = featureString.Count() * 3;
+        for (int pos = 0; pos < featureString.Count(); ++pos)
         {
+            // Prevents infinite insertions like {} > p / p_ where the Count keeps growing
+            if (pos > maxLength)
+                throw new Exception("Word tripled in length, triggering infinite loop protection");
             var rewrites = Rewriter.Rewrite(featureString, pos);
             if (rewrites.Any())
             {

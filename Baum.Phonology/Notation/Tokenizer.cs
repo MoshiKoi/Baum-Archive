@@ -22,6 +22,12 @@ record Slash : Token
     public static readonly Slash Default = new();
 }
 
+record EmptyToken : Token
+{
+    private EmptyToken() { }
+    public static readonly EmptyToken Default = new();
+}
+
 record SoundToken(IReadOnlySet<Feature> Features) : Token;
 record FeatureSetToken(IReadOnlySet<Feature> Included, IReadOnlySet<Feature> Excluded) : Token;
 
@@ -81,6 +87,18 @@ class SoundEnumerator : IEnumerator<Token>
                     ++_pos;
                     _current = Slash.Default;
                     return true;
+                case '{':
+                    ++_pos;
+                    if (_pos < _source.Length && _source[_pos] == '}')
+                    {
+                        ++_pos;
+                        _current = EmptyToken.Default;
+                        return true;
+                    }
+                    else
+                    {
+                        throw new NotImplementedException();
+                    }
                 default:
                     var sound = _data.GetStartSound(_source.Substring(_pos));
                     _pos += sound.Symbol.Length;

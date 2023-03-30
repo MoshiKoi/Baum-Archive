@@ -42,7 +42,7 @@ public ref struct NotationParser
     List<MatchNode> NextMatchSequence()
     {
         List<MatchNode> matchNodes = new();
-        while (_isValid && _tokens.Current is SoundToken or FeatureSetToken)
+        while (_isValid && _tokens.Current is SoundToken or FeatureSetToken or EmptyToken)
         {
             matchNodes.Add(NextMatchNode());
         }
@@ -66,6 +66,9 @@ public ref struct NotationParser
                 var result = new SoundMatchNode(token.Features);
                 Advance();
                 return result;
+            case EmptyToken:
+                Advance();
+                return new EmptyNode();
             default:
                 throw new NotImplementedException();
         }

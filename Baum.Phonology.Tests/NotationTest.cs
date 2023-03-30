@@ -38,4 +38,27 @@ public class NotationTest
         Assert.True(SoundChange.TryApply(initial, rule, stubData, out var result));
         Assert.Equal(expected, result);
     }
+
+    [Theory]
+    [InlineData("p > {}", "pamep", "ame")]
+    public void UnconditionalDeletionPasses(string rule, string initial, string expected)
+    {
+        Assert.True(SoundChange.TryApply(initial, rule, stubData, out var result));
+        Assert.Equal(expected, result);
+    }
+
+    [Theory]
+    [InlineData("{} > p / e_", "eme", "epmep")]
+    public void PreconditionInsertionPasses(string rule, string initial, string expected)
+    {
+        Assert.True(SoundChange.TryApply(initial, rule, stubData, out var result));
+        Assert.Equal(expected, result);
+    }
+
+    [Theory]
+    [InlineData("{} > p / p_", "pep")]
+    public void InfiniteSoundChangeFails(string rule, string initial)
+    {
+        Assert.False(SoundChange.TryApply(initial, rule, stubData, out var result));
+    }
 }

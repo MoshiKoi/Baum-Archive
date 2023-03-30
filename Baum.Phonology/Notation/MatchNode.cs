@@ -14,3 +14,8 @@ public record SoundMatchNode(IReadOnlySet<Feature> Features) : MatchNode
 {
     public override T Accept<T>(IMatchNodeVisitor<T> visitor) => visitor.Visit(this);
 }
+
+public record EmptyNode : MatchNode
+{
+    public override T Accept<T>(IMatchNodeVisitor<T> visitor) => visitor.Visit(this);
+}

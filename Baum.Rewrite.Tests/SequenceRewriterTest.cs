@@ -7,13 +7,13 @@ public class SequenceRewriterTest
     {
         SequenceRewriter<char> rewriter = new() {
             new MatchRewriter<char>('a'),
-            new MatchRewriter<char>('b', 'B'),
+            new MatchRewriter<char>('b', "XY"),
             new MatchRewriter<char>('c')
         };
 
         var result = string.Concat(rewriter.Rewrite("abc", 0).First().Rewrite);
 
-        Assert.Equal("aBc", result);
+        Assert.Equal("aXYc", result);
     }
 
     [Fact]
