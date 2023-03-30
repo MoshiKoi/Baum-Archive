@@ -99,6 +99,9 @@ class SoundEnumerator : IEnumerator<Token>
                     {
                         throw new NotImplementedException();
                     }
+                case '[':
+                    _current = NextFeatureSetToken();
+                    return true;
                 default:
                     var sound = _data.GetStartSound(_source.Substring(_pos));
                     _pos += sound.Symbol.Length;
@@ -107,6 +110,46 @@ class SoundEnumerator : IEnumerator<Token>
             }
         }
         return false;
+    }
+
+    FeatureSetToken NextFeatureSetToken()
+    {
+        ++_pos;
+        HashSet<Feature> included = new(), excluded = new();
+        do
+        {
+            while (char.IsWhiteSpace(_source, _pos))
+                ++_pos;
+
+            if (_source[_pos] == '+')
+            {
+                ++_pos;
+                included.Add(NextFeature());
+            }
+            else if (_source[_pos] == '-')
+            {
+                ++_pos;
+                excluded.Add(NextFeature());
+            }
+            else
+            {
+                throw new Exception();
+            }
+        } while (_source[_pos] != ']');
+        ++_pos;
+
+
+        return new FeatureSetToken(included, excluded);
+    }
+
+    Feature NextFeature()
+    {
+        var start = _pos;
+
+        while (char.IsLetter(_source, _pos))
+            ++_pos;
+
+        return new Feature(_source[start.._pos].ToString());
     }
 
     public void Reset() => _pos = 0;

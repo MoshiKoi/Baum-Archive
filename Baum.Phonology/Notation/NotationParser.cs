@@ -62,10 +62,12 @@ public ref struct NotationParser
     {
         switch (CurrentToken)
         {
-            case SoundToken token:
-                var result = new SoundMatchNode(token.Features);
+            case SoundToken { Features:var features}:
                 Advance();
-                return result;
+                return new SoundMatchNode(features);
+            case FeatureSetToken { Included: var included, Excluded: var excluded }:
+                Advance();
+                return new FeatureSetMatchNode(included, excluded);
             case EmptyToken:
                 Advance();
                 return new EmptyNode();

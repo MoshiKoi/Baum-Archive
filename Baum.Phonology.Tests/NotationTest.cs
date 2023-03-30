@@ -61,4 +61,29 @@ public class NotationTest
     {
         Assert.False(SoundChange.TryApply(initial, rule, stubData, out var result));
     }
+
+    [Theory]
+    [InlineData("p > [+voiced]", "pem", "bem")]
+    public void AddingFeaturesPasses(string rule, string initial, string expected)
+    {
+        Assert.True(SoundChange.TryApply(initial, rule, stubData, out var result));
+        Assert.Equal(expected, result);
+    }
+
+    [Theory]
+    [InlineData("b > [-voiced]", "bem", "pem")]
+    public void SubtractingFeaturesPasses(string rule, string initial, string expected)
+    {
+        Assert.True(SoundChange.TryApply(initial, rule, stubData, out var result));
+        Assert.Equal(expected, result);
+    }
+
+    [Theory]
+    [InlineData("[+voiced] > m", "peb", "pem")]
+    [InlineData("[+plosive -voiced] > {}", "peb", "eb")]
+    public void MatchingFeaturesPasses(string rule, string initial, string expected)
+    {
+        Assert.True(SoundChange.TryApply(initial, rule, stubData, out var result));
+        Assert.Equal(expected, result);
+    }
 }

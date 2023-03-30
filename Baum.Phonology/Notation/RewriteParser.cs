@@ -23,9 +23,9 @@ class SoundMatchRewriteParser : IMatchNodeVisitor<IRewriter<IReadOnlySet<Feature
     public SoundMatchRewriteParser(Predicate<IReadOnlySet<Feature>> match) => Match = match;
 
     public IRewriter<IReadOnlySet<Feature>> Visit(FeatureSetMatchNode replaceNode)
-    {
-        throw new NotImplementedException();
-    }
+        => new MatchRewriter<IReadOnlySet<Feature>>(
+            Match,
+            match => new[] { new HashSet<Feature>(match.Except(replaceNode.Excluded).Union(replaceNode.Included)) });
 
     public IRewriter<IReadOnlySet<Feature>> Visit(SoundMatchNode replaceNode)
         => new MatchRewriter<IReadOnlySet<Feature>>(Match, new[] { replaceNode.Features });
