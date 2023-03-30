@@ -9,8 +9,7 @@ public class SoundChange
     {
         try
         {
-            var node = NotationParser.Parse(rule, data);
-            var rewriter = node.Replace.Accept(node.Match.Accept(new SoundChangeRewriteParser()));
+            var rewriter = NotationParser.Parse(rule, data);
             var change = new SoundChange
             {
                 PhonologyData = data,

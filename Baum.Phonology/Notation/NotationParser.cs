@@ -1,8 +1,10 @@
+using Baum.Rewrite;
+
 namespace Baum.Phonology.Notation;
 
 public ref struct NotationParser
 {
-    public static SoundChangeNode Parse(string source, PhonologyData data)
+    public static IRewriter<IReadOnlySet<Feature>> Parse(string source, PhonologyData data)
         => new NotationParser(source, data).Parse();
 
     IEnumerator<Token> _tokens;
@@ -18,18 +20,33 @@ public ref struct NotationParser
         Advance();
     }
 
-    public SoundChangeNode Parse()
+    public IRewriter<IReadOnlySet<Feature>> Parse()
     {
         var match = NextMatchNode();
         Consume<DerivationSymbol>();
         var replace = NextPrimary();
 
-        return new SoundChangeNode(match, replace);
+        var rewriter = replace.Accept(match.Accept(new SoundChangeRewriteParser()));
+
+        if (_isValid)
+        {
+            Consume<Slash>();
+            return ParseCondition(rewriter);
+        }
+        else
+        {
+            return rewriter;
+        }
     }
 
-    MatchNode NextMatchSequence()
+    List<MatchNode> NextMatchSequence()
     {
-        throw new NotImplementedException();
+        List<MatchNode> matchNodes = new();
+        while (_isValid && _tokens.Current is SoundToken or FeatureSetToken)
+        {
+            matchNodes.Add(NextMatchNode());
+        }
+        return matchNodes;
     }
 
     // MatchNode : Primary
@@ -52,6 +69,22 @@ public ref struct NotationParser
             default:
                 throw new NotImplementedException();
         }
+    }
+
+    IRewriter<IReadOnlySet<Feature>> ParseCondition(IRewriter<IReadOnlySet<Feature>> changeRewriter)
+    {
+        var rewriter = new SequenceRewriter<IReadOnlySet<Feature>>();
+
+        foreach (var match in NextMatchSequence())
+            rewriter.Add(match.Accept(new SoundMatchRewriteMatchParser()));
+
+        Consume<Underscore>();
+        rewriter.Add(changeRewriter);
+
+        foreach (var match in NextMatchSequence())
+            rewriter.Add(match.Accept(new SoundMatchRewriteMatchParser()));
+
+        return rewriter;
     }
 
     void Consume<T>() where T : Token

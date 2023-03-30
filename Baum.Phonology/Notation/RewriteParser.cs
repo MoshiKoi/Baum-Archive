@@ -1,23 +1,23 @@
 using Baum.Rewrite;
 using Baum.Phonology.Notation;
 
-namespace Baum.Phonology;
+namespace Baum.Phonology.Notation;
 
 class SoundChangeRewriteParser : IMatchNodeVisitor<IMatchNodeVisitor<IRewriter<IReadOnlySet<Feature>>>>
 {
     public IMatchNodeVisitor<IRewriter<IReadOnlySet<Feature>>> Visit(FeatureSetMatchNode matchNode)
-    {
-        throw new NotImplementedException();
-    }
+        => new SoundMatchRewriteParser(featureSet
+            => featureSet.IsSupersetOf(matchNode.Included)
+            && !featureSet.Intersect(matchNode.Excluded).Any());
 
     public IMatchNodeVisitor<IRewriter<IReadOnlySet<Feature>>> Visit(SoundMatchNode matchNode)
-        => new SoundMatchRewriteParser(matchNode);
+        => new SoundMatchRewriteParser(featureSet => featureSet.SetEquals(matchNode.Features));
 }
 
 class SoundMatchRewriteParser : IMatchNodeVisitor<IRewriter<IReadOnlySet<Feature>>>
 {
-    SoundMatchNode _matchNnode;
-    public SoundMatchRewriteParser(SoundMatchNode matchNode) => _matchNnode = matchNode;
+    Predicate<IReadOnlySet<Feature>> Match;
+    public SoundMatchRewriteParser(Predicate<IReadOnlySet<Feature>> match) => Match = match;
 
     public IRewriter<IReadOnlySet<Feature>> Visit(FeatureSetMatchNode replaceNode)
     {
@@ -25,7 +25,5 @@ class SoundMatchRewriteParser : IMatchNodeVisitor<IRewriter<IReadOnlySet<Feature
     }
 
     public IRewriter<IReadOnlySet<Feature>> Visit(SoundMatchNode replaceNode)
-        => new MatchRewriter<IReadOnlySet<Feature>>(
-            featureSet => featureSet.SetEquals(_matchNnode.Features),
-            replaceNode.Features);
+        => new MatchRewriter<IReadOnlySet<Feature>>(Match, replaceNode.Features);
 }

@@ -6,9 +6,21 @@ record Token;
 
 record DerivationSymbol : Token
 {
-    private DerivationSymbol() {}
+    private DerivationSymbol() { }
     public static readonly DerivationSymbol Default = new();
-};
+}
+
+record Underscore : Token
+{
+    private Underscore() { }
+    public static readonly Underscore Default = new();
+}
+
+record Slash : Token
+{
+    private Slash() { }
+    public static readonly Slash Default = new();
+}
 
 record SoundToken(IReadOnlySet<Feature> Features) : Token;
 record FeatureSetToken(IReadOnlySet<Feature> Included, IReadOnlySet<Feature> Excluded) : Token;
@@ -60,6 +72,14 @@ class SoundEnumerator : IEnumerator<Token>
                 case '>':
                     ++_pos;
                     _current = DerivationSymbol.Default;
+                    return true;
+                case '_':
+                    ++_pos;
+                    _current = Underscore.Default;
+                    return true;
+                case '/':
+                    ++_pos;
+                    _current = Slash.Default;
                     return true;
                 default:
                     var sound = _data.GetStartSound(_source.Substring(_pos));
