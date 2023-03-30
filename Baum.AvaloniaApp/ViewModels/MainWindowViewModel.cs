@@ -1,11 +1,14 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Reactive;
+using System.Reactive.Linq;
+using Avalonia;
+using Avalonia.Platform;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-using System.Reactive.Linq;
 
-using Baum.AvaloniaApp.Models;
 using Baum.AvaloniaApp.Services;
 
 namespace Baum.AvaloniaApp.ViewModels;
@@ -43,21 +46,36 @@ public class MainWindowViewModel : ViewModelBase
             // var tempFile = await RequestTemporaryFileInteraction.Handle(Unit.Default);
             // file.CopyTo(tempFile.FullName, true);
             var tempFile = file;
-            Open(await GetDatabase(tempFile), file);
+            await OpenAsync(await GetDatabase(tempFile), file);
         }
     }
 
     async Task NewFileAsync()
     {
         var file = await RequestTemporaryFileInteraction.Handle(Unit.Default);
-        Open(await GetDatabase(file), null);
+        await OpenAsync(await GetDatabase(file), null);
     }
 
-    void Open(IProjectDatabase database, FileInfo? file)
+    async Task OpenAsync(IProjectDatabase database, FileInfo? file)
     {
+        var assets = AvaloniaLocator.Current.GetService<IAssetLoader>();
+        List<Phonology.Sound> sounds = new();
+        using (var stream = assets.Open(new Uri("avares://Baum.AvaloniaApp/Assets/ipa-consonants.csv")))
+        {
+            using var reader = new StreamReader(stream);
+            sounds.AddRange(await Phonology.Utils.CsvLoader.LoadAsync(reader));
+        }
+
+        using (var stream = assets.Open(new Uri("avares://Baum.AvaloniaApp/Assets/ipa-vowels.csv")))
+        {
+            using var reader = new StreamReader(stream);
+            sounds.AddRange(await Phonology.Utils.CsvLoader.LoadAsync(reader));
+        }
+
         var vm = new ProjectViewModel(
             database,
-            file);
+            file,
+            new(sounds));
 
         vm.RequestSaveFileInteraction.RegisterHandler(
             async i => i.SetOutput(await RequestSaveFileInteraction.Handle(Unit.Default)));

@@ -1,12 +1,11 @@
-using System;
 using System.IO;
-using System.Collections.ObjectModel;
-using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
+
+using Baum.Phonology;
 
 using Baum.AvaloniaApp.Models;
 using Baum.AvaloniaApp.Services;
@@ -15,6 +14,7 @@ namespace Baum.AvaloniaApp.ViewModels;
 
 public class ProjectViewModel : ViewModelBase
 {
+    PhonologyData Data { get; set; }
     IProjectDatabase Database { get; }
     FileInfo? SaveFileInfo { get; set; }
 
@@ -27,8 +27,9 @@ public class ProjectViewModel : ViewModelBase
 
     public Interaction<Unit, FileInfo> RequestSaveFileInteraction { get; }
 
-    public ProjectViewModel(IProjectDatabase database, FileInfo? file)
+    public ProjectViewModel(IProjectDatabase database, FileInfo? file, PhonologyData data)
     {
+        Data = data;
         Database = database;
         SaveFileInfo = file;
         OpenLanguageCommand = ReactiveCommand.Create<LanguageModel>(OpenLanguage);
@@ -53,5 +54,5 @@ public class ProjectViewModel : ViewModelBase
         }
     }
 
-    void OpenLanguage(LanguageModel language) => Content = new LanguageViewModel(language, Database);
+    void OpenLanguage(LanguageModel language) => Content = new LanguageViewModel(language, Database, Data);
 }

@@ -1,15 +1,11 @@
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
-using Avalonia;
-using Avalonia.Platform;
-using Avalonia.Reactive;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
+
+using Baum.Phonology;
 
 using Baum.AvaloniaApp.Models;
 using Baum.AvaloniaApp.Services;
@@ -18,6 +14,7 @@ namespace Baum.AvaloniaApp.ViewModels;
 
 public class LanguageViewModel : ViewModelBase
 {
+    PhonologyData Data { get; set; }
     IProjectDatabase Database { get; set; }
 
     [Reactive]
@@ -31,11 +28,12 @@ public class LanguageViewModel : ViewModelBase
     public ReactiveCommand<Unit, Unit> AddWordCommand { get; }
     public ReactiveCommand<LanguageModel, Unit> SaveCommand { get; }
 
-    public LanguageViewModel(LanguageModel language, IProjectDatabase database)
+    public LanguageViewModel(LanguageModel language, IProjectDatabase database, PhonologyData data)
     {
         Language = language;
         Words = new();
         Database = database;
+        Data = data;
         AddWordCommand = ReactiveCommand.CreateFromTask(async () =>
         {
             await Database.AddAsync(new WordModel
@@ -68,25 +66,10 @@ public class LanguageViewModel : ViewModelBase
 
     public async Task LoadAsync()
     {
-        // TODO: Dependency injection probably
-        var assets = AvaloniaLocator.Current.GetService<IAssetLoader>();
-        List<Phonology.Sound> sounds = new();
-        using (var stream = assets.Open(new Uri("avares://Baum.AvaloniaApp/Assets/ipa-consonants.csv")))
-        {
-            using var reader = new StreamReader(stream);
-            sounds.AddRange(await Phonology.Utils.CsvLoader.LoadAsync(reader));
-        }
-
-        using (var stream = assets.Open(new Uri("avares://Baum.AvaloniaApp/Assets/ipa-vowels.csv")))
-        {
-            using var reader = new StreamReader(stream);
-            sounds.AddRange(await Phonology.Utils.CsvLoader.LoadAsync(reader));
-        }
-
         Words.Clear();
-        foreach (var word in await Database.GetWordsAsync(Language.Id, new(sounds)))
+        foreach (var word in await Database.GetWordsAsync(Language.Id, Data))
         {
-            Words.Add(new(word, Database));
+            Words.Add(new(word, Database, Data));
         }
     }
 }
