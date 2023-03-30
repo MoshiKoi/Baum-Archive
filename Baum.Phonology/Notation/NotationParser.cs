@@ -42,7 +42,7 @@ public ref struct NotationParser
     List<MatchNode> NextMatchSequence()
     {
         List<MatchNode> matchNodes = new();
-        while (_isValid && _tokens.Current is SoundToken or FeatureSetToken or EmptyToken)
+        while (_isValid && _tokens.Current is SoundToken or OpenBracket or EmptyToken)
         {
             matchNodes.Add(NextMatchNode());
         }
@@ -62,11 +62,31 @@ public ref struct NotationParser
     {
         switch (CurrentToken)
         {
-            case SoundToken { Features:var features}:
+            case SoundToken { Features: var features }:
                 Advance();
                 return new SoundMatchNode(features);
-            case FeatureSetToken { Included: var included, Excluded: var excluded }:
+            case OpenBracket:
                 Advance();
+                HashSet<Feature> included = new(), excluded = new();
+                while (true)
+                {
+                    if (CurrentToken is PositiveFeature { Feature: var positive })
+                    {
+                        Advance();
+                        included.Add(positive);
+                    }
+                    else if (CurrentToken is NegativeFeature { Feature: var negative })
+                    {
+                        Advance();
+                        excluded.Add(negative);
+                    }
+                    else {
+                        break;
+                    }
+                    if (CurrentToken is Comma)
+                        Advance();
+                }
+                Consume<CloseBracket>();
                 return new FeatureSetMatchNode(included, excluded);
             case EmptyToken:
                 Advance();

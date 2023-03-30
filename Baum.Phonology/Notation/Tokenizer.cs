@@ -22,6 +22,27 @@ record Slash : Token
     public static readonly Slash Default = new();
 }
 
+record OpenBracket : Token
+{
+    private OpenBracket() { }
+    public static readonly OpenBracket Default = new();
+}
+
+record CloseBracket : Token
+{
+    private CloseBracket() { }
+    public static readonly CloseBracket Default = new();
+}
+
+record Comma : Token
+{
+    private Comma() { }
+    public static readonly Comma Default = new();
+}
+
+record PositiveFeature(Feature Feature) : Token;
+record NegativeFeature(Feature Feature) : Token;
+
 record EmptyToken : Token
 {
     private EmptyToken() { }
@@ -29,7 +50,6 @@ record EmptyToken : Token
 }
 
 record SoundToken(IReadOnlySet<Feature> Features) : Token;
-record FeatureSetToken(IReadOnlySet<Feature> Included, IReadOnlySet<Feature> Excluded) : Token;
 
 class Tokenizer
 {
@@ -75,17 +95,19 @@ class SoundEnumerator : IEnumerator<Token>
             switch (_source[_pos])
             {
                 case char c when char.IsWhiteSpace(c): ++_pos; continue;
-                case '>':
+                case '>': ++_pos; _current = DerivationSymbol.Default; return true;
+                case '_': ++_pos; _current = Underscore.Default; return true;
+                case '/': ++_pos; _current = Slash.Default; return true;
+                case '[': ++_pos; _current = OpenBracket.Default; return true;
+                case ']': ++_pos; _current = CloseBracket.Default; return true;
+                case ',': ++_pos; _current = Comma.Default; return true;
+                case '+':
                     ++_pos;
-                    _current = DerivationSymbol.Default;
+                    _current = new PositiveFeature(NextFeature());
                     return true;
-                case '_':
+                case '-':
                     ++_pos;
-                    _current = Underscore.Default;
-                    return true;
-                case '/':
-                    ++_pos;
-                    _current = Slash.Default;
+                    _current = new NegativeFeature(NextFeature());
                     return true;
                 case '{':
                     ++_pos;
@@ -99,9 +121,6 @@ class SoundEnumerator : IEnumerator<Token>
                     {
                         throw new NotImplementedException();
                     }
-                case '[':
-                    _current = NextFeatureSetToken();
-                    return true;
                 default:
                     var sound = _data.GetStartSound(_source.Substring(_pos));
                     _pos += sound.Symbol.Length;
@@ -110,36 +129,6 @@ class SoundEnumerator : IEnumerator<Token>
             }
         }
         return false;
-    }
-
-    FeatureSetToken NextFeatureSetToken()
-    {
-        ++_pos;
-        HashSet<Feature> included = new(), excluded = new();
-        do
-        {
-            while (char.IsWhiteSpace(_source, _pos))
-                ++_pos;
-
-            if (_source[_pos] == '+')
-            {
-                ++_pos;
-                included.Add(NextFeature());
-            }
-            else if (_source[_pos] == '-')
-            {
-                ++_pos;
-                excluded.Add(NextFeature());
-            }
-            else
-            {
-                throw new Exception();
-            }
-        } while (_source[_pos] != ']');
-        ++_pos;
-
-
-        return new FeatureSetToken(included, excluded);
     }
 
     Feature NextFeature()
