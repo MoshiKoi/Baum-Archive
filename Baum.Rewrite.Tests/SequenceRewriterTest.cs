@@ -15,4 +15,18 @@ public class SequenceRewriterTest
 
         Assert.Equal("aBc", result);
     }
+
+    [Fact]
+    public void InsertionInBetweenMatchesWorks()
+    {
+        SequenceRewriter<char> rewriter = new() {
+            new MatchRewriter<char>('a'),
+            new EmptyRewriter<char>("b"),
+            new MatchRewriter<char>('c')
+        };
+
+        var result = string.Concat(rewriter.Rewrite("ac", 0).First().Rewrite);
+
+        Assert.Equal("abc", result);
+    }
 }
