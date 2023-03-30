@@ -17,5 +17,6 @@ public class SoundTest
         Assert.True(secondSound.Equals(firstSound));
 
         Assert.Equal(firstSound, secondSound);
+        Assert.Equal(firstSound.GetHashCode(), secondSound.GetHashCode());
     }
 }
