@@ -1,38 +1,20 @@
-﻿using Baum.Phonology.Notation;
+﻿using Baum.Rewrite;
+using Baum.Phonology.Notation;
 
 namespace Baum.Phonology;
 
 public class SoundChange
 {
-    class MatchVisitor : MatchNodeVisitor<bool>
-    {
-        IReadOnlySet<Feature> _features;
-        public MatchVisitor(IReadOnlySet<Feature> features) => _features = features;
-        public bool Visit(FeatureSetMatchNode node)
-            => _features.IsSupersetOf(node.Included) && !_features.Intersect(node.Excluded).Any();
-        public bool Visit(SoundMatchNode node) => _features.SetEquals(node.Features);
-    }
-
-    class ReplaceVisitor : MatchNodeVisitor<IReadOnlySet<Feature>>
-    {
-        IReadOnlySet<Feature> _features;
-        public ReplaceVisitor(IReadOnlySet<Feature> features) => _features = features;
-        public IReadOnlySet<Feature> Visit(FeatureSetMatchNode node)
-            => new HashSet<Feature>(_features.Except(node.Excluded).Union(node.Included));
-
-        public IReadOnlySet<Feature> Visit(SoundMatchNode node) => node.Features;
-    }
-
     public static bool TryApply(string initial, string rule, PhonologyData data, out string after)
     {
         try
         {
             var node = NotationParser.Parse(rule, data);
+            var rewriter = node.Replace.Accept(node.Match.Accept(new SoundChangeRewriteParser()));
             var change = new SoundChange
             {
                 PhonologyData = data,
-                MatchNode = node.Match,
-                Replacement = node.Replace,
+                Rewriter = rewriter
             };
 
             after = change.Apply(initial);
@@ -45,17 +27,30 @@ public class SoundChange
         }
     }
 
+    public required IRewriter<IReadOnlySet<Feature>> Rewriter { get; set; }
     public required PhonologyData PhonologyData { get; set; }
-    public required MatchNode MatchNode { get; set; }
-    public required MatchNode Replacement { get; set; }
-    public string Apply(string str)
+
+    string Apply(string str)
     {
-        return string.Concat(new Tokenization(str, PhonologyData)
-            .Select(sound => ((SoundToken)sound).Features)
-            .Select(features => MatchNode.Accept(new MatchVisitor(features))
-                ? Replacement.Accept(new ReplaceVisitor(features))
-                : features)
-            .Select(PhonologyData.GetSound)
-            .Select(sound => sound.Symbol));
+        var featureString = new Tokenization(str, PhonologyData)
+            .Select(sound => ((SoundToken)sound).Features);
+
+        // TODO: Not quite sure if this algorithm is actually the best way to do this
+        // Replaces every match in the string
+        int len = featureString.Count();
+        for (int pos = 0; pos < len; ++pos)
+        {
+            var rewrites = Rewriter.Rewrite(featureString, pos);
+            if (rewrites.Any())
+            {
+                var replacement = rewrites.MaxBy(pair => pair.RewritePosition);
+                featureString = featureString
+                    .Take(pos)
+                    .Concat(replacement.Rewrite)
+                    .Concat(featureString.Skip(replacement.RewritePosition));
+            }
+        }
+
+        return string.Concat(featureString.Select(f => PhonologyData.GetSound(f).Symbol));
     }
 }

@@ -11,38 +11,38 @@ public class SoundChangeTest
         new Sound("b", new HashSet<Feature>() { new("consonant"), new("plosive"), new("voiced") } ),
     });
 
-    [Fact]
-    public void VoicingAddition()
-    {
-        var change = new SoundChange
-        {
-            PhonologyData = stubData,
-            MatchNode = new Notation.SoundMatchNode(new HashSet<Feature> { new("consonant"), new("plosive") }),
-            Replacement = new Notation.FeatureSetMatchNode(
-                new HashSet<Feature> { new("voiced") },
-                new HashSet<Feature>())
-        };
+    // [Fact]
+    // public void VoicingAddition()
+    // {
+    //     var change = new SoundChange
+    //     {
+    //         PhonologyData = stubData,
+    //         MatchNode = new Notation.SoundMatchNode(new HashSet<Feature> { new("consonant"), new("plosive") }),
+    //         Replacement = new Notation.FeatureSetMatchNode(
+    //             new HashSet<Feature> { new("voiced") },
+    //             new HashSet<Feature>())
+    //     };
 
-        var result = change.Apply("pam");
-        Assert.Equal("bam", result);
-    }
+    //     var result = change.Apply("pam");
+    //     Assert.Equal("bam", result);
+    // }
 
-    [Fact]
-    public void Devoicing()
-    {
-        var change = new SoundChange
-        {
-            PhonologyData = stubData,
-            MatchNode = new Notation.SoundMatchNode(
-                new HashSet<Feature> { new("consonant"), new("plosive"), new("voiced") }),
-            Replacement = new Notation.FeatureSetMatchNode(
-                new HashSet<Feature>(),
-                new HashSet<Feature> { new("voiced") })
-        };
+    // [Fact]
+    // public void Devoicing()
+    // {
+    //     var change = new SoundChange
+    //     {
+    //         PhonologyData = stubData,
+    //         MatchNode = new Notation.SoundMatchNode(
+    //             new HashSet<Feature> { new("consonant"), new("plosive"), new("voiced") }),
+    //         Replacement = new Notation.FeatureSetMatchNode(
+    //             new HashSet<Feature>(),
+    //             new HashSet<Feature> { new("voiced") })
+    //     };
 
-        var result = change.Apply("bam");
-        Assert.Equal("pam", result);
-    }
+    //     var result = change.Apply("bam");
+    //     Assert.Equal("pam", result);
+    // }
 
     // [Fact]
     // public void Insertion()
