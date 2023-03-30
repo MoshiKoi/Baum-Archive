@@ -2,7 +2,7 @@ namespace Baum.Phonology.Utils;
 
 public static class CsvLoader
 {
-    public static async Task<IEnumerable<Sound>> LoadAsync(StreamReader stream)
+    public static async Task<IEnumerable<Sound>> LoadAsync(TextReader stream)
     {
         // TODO: Use header row for feature categories
         var headerLine = await stream.ReadLineAsync();
