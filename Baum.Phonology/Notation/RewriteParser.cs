@@ -15,6 +15,9 @@ class SoundChangeRewriteParser : IMatchNodeVisitor<IMatchNodeVisitor<IRewriter<I
 
     public IMatchNodeVisitor<IRewriter<IReadOnlySet<Feature>>> Visit(EmptyNode matchNode)
         => new EmptyMatchRewriteParser();
+
+    public IMatchNodeVisitor<IRewriter<IReadOnlySet<Feature>>> Visit(MatchListNode matchNode)
+        => new MatchListRewriteParser(matchNode.Nodes);
 }
 
 class SoundMatchRewriteParser : IMatchNodeVisitor<IRewriter<IReadOnlySet<Feature>>>
@@ -32,6 +35,34 @@ class SoundMatchRewriteParser : IMatchNodeVisitor<IRewriter<IReadOnlySet<Feature
 
     public IRewriter<IReadOnlySet<Feature>> Visit(EmptyNode node)
         => new MatchRewriter<IReadOnlySet<Feature>>(Match, Enumerable.Empty<IReadOnlySet<Feature>>());
+
+    public IRewriter<IReadOnlySet<Feature>> Visit(MatchListNode replaceNode)
+        // a > {b,c} makes no sense
+        => throw new Exception("Cannot decide between replacements in list");
+}
+
+class MatchListRewriteParser : IMatchNodeVisitor<IRewriter<IReadOnlySet<Feature>>>
+{
+    List<MatchNode> MatchNodes { get; set; }
+
+    public MatchListRewriteParser(List<MatchNode> matchNodes) => MatchNodes = matchNodes;
+
+    public IRewriter<IReadOnlySet<Feature>> Visit(FeatureSetMatchNode replaceNode)
+        => new AlternativeRewriter<IReadOnlySet<Feature>>(
+            MatchNodes.Select(matchNode => matchNode.Accept(new SoundChangeRewriteParser()).Visit(replaceNode)));
+
+    public IRewriter<IReadOnlySet<Feature>> Visit(SoundMatchNode replaceNode)
+        => new AlternativeRewriter<IReadOnlySet<Feature>>(
+            MatchNodes.Select(matchNode => matchNode.Accept(new SoundChangeRewriteParser()).Visit(replaceNode)));
+
+    public IRewriter<IReadOnlySet<Feature>> Visit(MatchListNode replaceNode)
+        => new AlternativeRewriter<IReadOnlySet<Feature>>(
+            Enumerable.Zip(MatchNodes, replaceNode.Nodes)
+                .Select(pair => pair.Second.Accept(pair.First.Accept(new SoundChangeRewriteParser()))));
+
+    public IRewriter<IReadOnlySet<Feature>> Visit(EmptyNode replaceNode)
+        => new AlternativeRewriter<IReadOnlySet<Feature>>(
+            MatchNodes.Select(matchNode => matchNode.Accept(new SoundChangeRewriteParser()).Visit(replaceNode)));
 }
 
 class EmptyMatchRewriteParser : IMatchNodeVisitor<IRewriter<IReadOnlySet<Feature>>>
@@ -46,4 +77,7 @@ class EmptyMatchRewriteParser : IMatchNodeVisitor<IRewriter<IReadOnlySet<Feature
     public IRewriter<IReadOnlySet<Feature>> Visit(EmptyNode replaceNode)
         // {} > {} also makes no sense
         => throw new Exception("Cannot replace nothing with nothing");
+
+    public IRewriter<IReadOnlySet<Feature>> Visit(MatchListNode node)
+        => throw new Exception("Cannot decide between replacements in list");
 }

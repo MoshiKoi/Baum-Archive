@@ -16,4 +16,9 @@ class SoundMatchRewriteMatchParser : IMatchNodeVisitor<IRewriter<IReadOnlySet<Fe
 
     public IRewriter<IReadOnlySet<Feature>> Visit(EmptyNode node)
         => new EmptyRewriter<IReadOnlySet<Feature>>(Enumerable.Empty<IReadOnlySet<Feature>>());
+
+    public IRewriter<IReadOnlySet<Feature>> Visit(MatchListNode node)
+    {
+        throw new NotImplementedException();
+    }
 }

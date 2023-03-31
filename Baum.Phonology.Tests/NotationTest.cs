@@ -6,7 +6,8 @@ public class NotationTest
     {
         new Sound("a", new HashSet<Feature>() { new("vowel"), new("open")}),
         new Sound("e", new HashSet<Feature>() { new("vowel"), new("close-mid") }),
-        new Sound("m", new HashSet<Feature>() { new("consonant"), new("nasal") } ),
+        new Sound("m̥", new HashSet<Feature>() { new("consonant"), new("nasal") }),
+        new Sound("m", new HashSet<Feature>() { new("consonant"), new("nasal"), new("voiced") }),
         new Sound("p", new HashSet<Feature>() { new("consonant"), new("plosive") } ),
         new Sound("b", new HashSet<Feature>() { new("consonant"), new("plosive"), new("voiced") } ),
     });
@@ -82,6 +83,31 @@ public class NotationTest
     [InlineData("[+voiced] > m", "peb", "pem")]
     [InlineData("[+plosive -voiced] > {}", "peb", "eb")]
     public void MatchingFeaturesPasses(string rule, string initial, string expected)
+    {
+        Assert.True(SoundChange.TryApply(initial, rule, stubData, out var result));
+        Assert.Equal(expected, result);
+    }
+
+    [Theory]
+    [InlineData("{a,e,{p,b}} > {e,a,{b,p}}", "pabe", "bepa")]
+    public void MappingBracedList(string rule, string initial, string expected)
+    {
+        Assert.True(SoundChange.TryApply(initial, rule, stubData, out var result));
+        Assert.Equal(expected, result);
+    }
+
+    [Theory]
+    [InlineData("{p,b} > m", "pabe", "mame")]
+    public void BracedListToSound(string rule, string initial, string expected)
+    {
+        Assert.True(SoundChange.TryApply(initial, rule, stubData, out var result));
+        Assert.Equal(expected, result);
+    }
+
+    [Theory]
+    [InlineData("{b,m} > [-voiced]", "bame", "pam̥e")]
+    [InlineData("{p,m̥} > [+voiced]", "pam̥e", "bame")]
+    public void BracedListToFeatureChange(string rule, string initial, string expected)
     {
         Assert.True(SoundChange.TryApply(initial, rule, stubData, out var result));
         Assert.Equal(expected, result);

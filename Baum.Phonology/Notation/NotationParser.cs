@@ -24,7 +24,7 @@ public ref struct NotationParser
     {
         var match = NextMatchNode();
         Consume<DerivationSymbol>();
-        var replace = NextPrimary();
+        var replace = NextMatchNode();
 
         var rewriter = replace.Accept(match.Accept(new SoundChangeRewriteParser()));
 
@@ -42,23 +42,17 @@ public ref struct NotationParser
     List<MatchNode> NextMatchSequence()
     {
         List<MatchNode> matchNodes = new();
-        while (_isValid && _tokens.Current is SoundToken or OpenBracket or EmptyToken)
+        while (_isValid && _tokens.Current is SoundToken or OpenBracket or OpenBrace)
         {
             matchNodes.Add(NextMatchNode());
         }
         return matchNodes;
     }
 
-    // MatchNode : Primary
-    //           | OrSet
+    // MatchNode : IPASymbol
+    //           | FeatureSet
+    //           | List
     MatchNode NextMatchNode()
-    {
-        return NextPrimary();
-    }
-
-    // Primary : IPASymbol
-    //         | FeatureSet
-    MatchNode NextPrimary()
     {
         switch (CurrentToken)
         {
@@ -66,34 +60,63 @@ public ref struct NotationParser
                 Advance();
                 return new SoundMatchNode(features);
             case OpenBracket:
-                Advance();
-                HashSet<Feature> included = new(), excluded = new();
-                while (true)
-                {
-                    if (CurrentToken is PositiveFeature { Feature: var positive })
-                    {
-                        Advance();
-                        included.Add(positive);
-                    }
-                    else if (CurrentToken is NegativeFeature { Feature: var negative })
-                    {
-                        Advance();
-                        excluded.Add(negative);
-                    }
-                    else {
-                        break;
-                    }
-                    if (CurrentToken is Comma)
-                        Advance();
-                }
-                Consume<CloseBracket>();
-                return new FeatureSetMatchNode(included, excluded);
-            case EmptyToken:
-                Advance();
-                return new EmptyNode();
+                return NextFeatureSet();
+            case OpenBrace:
+                return NextMatchList();
             default:
                 throw new NotImplementedException();
         }
+    }
+
+    FeatureSetMatchNode NextFeatureSet()
+    {
+        Advance();
+        HashSet<Feature> included = new(), excluded = new();
+        while (true)
+        {
+            if (CurrentToken is PositiveFeature { Feature: var positive })
+            {
+                Advance();
+                included.Add(positive);
+            }
+            else if (CurrentToken is NegativeFeature { Feature: var negative })
+            {
+                Advance();
+                excluded.Add(negative);
+            }
+            else
+            {
+                break;
+            }
+            if (CurrentToken is Comma)
+                Advance();
+        }
+        Consume<CloseBracket>();
+        return new FeatureSetMatchNode(included, excluded);
+    }
+
+    MatchNode NextMatchList()
+    {
+        Consume<OpenBrace>();
+        List<MatchNode> nodes = new();
+        while (true)
+        {
+            if (CurrentToken is SoundToken or OpenBracket or OpenBrace)
+            {
+                nodes.Add(NextMatchNode());
+            }
+            else
+            {
+                break;
+            }
+            if (CurrentToken is Comma)
+                Advance();
+        }
+        Consume<CloseBrace>();
+        if (nodes.Any())
+            return new MatchListNode(nodes);
+        else
+            return new EmptyNode();
     }
 
     IRewriter<IReadOnlySet<Feature>> ParseCondition(IRewriter<IReadOnlySet<Feature>> changeRewriter)

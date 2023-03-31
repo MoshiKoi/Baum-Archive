@@ -34,6 +34,18 @@ record CloseBracket : Token
     public static readonly CloseBracket Default = new();
 }
 
+record OpenBrace : Token
+{
+    private OpenBrace() { }
+    public static readonly OpenBrace Default = new();
+}
+
+record CloseBrace : Token
+{
+    private CloseBrace() { }
+    public static readonly CloseBrace Default = new();
+}
+
 record Comma : Token
 {
     private Comma() { }
@@ -42,12 +54,6 @@ record Comma : Token
 
 record PositiveFeature(Feature Feature) : Token;
 record NegativeFeature(Feature Feature) : Token;
-
-record EmptyToken : Token
-{
-    private EmptyToken() { }
-    public static readonly EmptyToken Default = new();
-}
 
 record SoundToken(IReadOnlySet<Feature> Features) : Token;
 
@@ -100,6 +106,8 @@ class SoundEnumerator : IEnumerator<Token>
                 case '/': ++_pos; _current = Slash.Default; return true;
                 case '[': ++_pos; _current = OpenBracket.Default; return true;
                 case ']': ++_pos; _current = CloseBracket.Default; return true;
+                case '{': ++_pos; _current = OpenBrace.Default; return true;
+                case '}': ++_pos; _current = CloseBrace.Default; return true;
                 case ',': ++_pos; _current = Comma.Default; return true;
                 case '+':
                     ++_pos;
@@ -109,18 +117,6 @@ class SoundEnumerator : IEnumerator<Token>
                     ++_pos;
                     _current = new NegativeFeature(NextFeature());
                     return true;
-                case '{':
-                    ++_pos;
-                    if (_pos < _source.Length && _source[_pos] == '}')
-                    {
-                        ++_pos;
-                        _current = EmptyToken.Default;
-                        return true;
-                    }
-                    else
-                    {
-                        throw new NotImplementedException();
-                    }
                 default:
                     var sound = _data.GetStartSound(_source.Substring(_pos));
                     _pos += sound.Symbol.Length;
