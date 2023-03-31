@@ -18,6 +18,9 @@ class SoundChangeRewriteParser : IMatchNodeVisitor<IMatchNodeVisitor<IRewriter<I
 
     public IMatchNodeVisitor<IRewriter<IReadOnlySet<Feature>>> Visit(MatchListNode matchNode)
         => new MatchListRewriteParser(matchNode.Nodes);
+
+    public IMatchNodeVisitor<IRewriter<IReadOnlySet<Feature>>> Visit(EndMatchNode node)
+        => new EndMatchRewriteParser();
 }
 
 class SoundMatchRewriteParser : IMatchNodeVisitor<IRewriter<IReadOnlySet<Feature>>>
@@ -39,6 +42,9 @@ class SoundMatchRewriteParser : IMatchNodeVisitor<IRewriter<IReadOnlySet<Feature
     public IRewriter<IReadOnlySet<Feature>> Visit(MatchListNode replaceNode)
         // a > {b,c} makes no sense
         => throw new Exception("Cannot decide between replacements in list");
+
+    public IRewriter<IReadOnlySet<Feature>> Visit(EndMatchNode node)
+        => throw new Exception("Word terminator is not a valid replacement");
 }
 
 class MatchListRewriteParser : IMatchNodeVisitor<IRewriter<IReadOnlySet<Feature>>>
@@ -63,6 +69,29 @@ class MatchListRewriteParser : IMatchNodeVisitor<IRewriter<IReadOnlySet<Feature>
     public IRewriter<IReadOnlySet<Feature>> Visit(EmptyNode replaceNode)
         => new AlternativeRewriter<IReadOnlySet<Feature>>(
             MatchNodes.Select(matchNode => matchNode.Accept(new SoundChangeRewriteParser()).Visit(replaceNode)));
+
+    public IRewriter<IReadOnlySet<Feature>> Visit(EndMatchNode node)
+        => throw new Exception("Word terminator is not a valid replacement");
+}
+
+class EndMatchRewriteParser : IMatchNodeVisitor<IRewriter<IReadOnlySet<Feature>>>
+{
+    public IRewriter<IReadOnlySet<Feature>> Visit(FeatureSetMatchNode replaceNode)
+        // # > [+voiced] makes little sense
+        => throw new Exception("Cannot add or subtract features from the word terminator");
+
+    public IRewriter<IReadOnlySet<Feature>> Visit(SoundMatchNode replaceNode)
+        => new EndRewriter<IReadOnlySet<Feature>>(new[] { replaceNode.Features });
+
+    public IRewriter<IReadOnlySet<Feature>> Visit(EmptyNode replaceNode)
+        // # > {} also makes no sense
+        => throw new Exception("Cannot replace nothing with nothing");
+
+    public IRewriter<IReadOnlySet<Feature>> Visit(MatchListNode node)
+        => throw new Exception("Cannot decide between replacements in list");
+
+    public IRewriter<IReadOnlySet<Feature>> Visit(EndMatchNode node)
+        => throw new Exception("Word terminator is not a valid replacement");
 }
 
 class EmptyMatchRewriteParser : IMatchNodeVisitor<IRewriter<IReadOnlySet<Feature>>>
@@ -80,4 +109,7 @@ class EmptyMatchRewriteParser : IMatchNodeVisitor<IRewriter<IReadOnlySet<Feature
 
     public IRewriter<IReadOnlySet<Feature>> Visit(MatchListNode node)
         => throw new Exception("Cannot decide between replacements in list");
+
+    public IRewriter<IReadOnlySet<Feature>> Visit(EndMatchNode node)
+        => throw new Exception("Word terminator is not a valid replacement");
 }

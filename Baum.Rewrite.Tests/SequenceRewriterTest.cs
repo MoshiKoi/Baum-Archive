@@ -31,6 +31,16 @@ public class SequenceRewriterTest
     }
 
     [Fact]
+    public void EndDoesntMatchNotAtEnd()
+    {
+        SequenceRewriter<char> rewriter = new() {
+            new MatchRewriter<char>('a'),
+            new EndRewriter<char>("")
+        };
+        Assert.Empty(rewriter.Rewrite("ab", 0));
+    }
+
+    [Fact]
     public void InsertionInBetweenMatchesWorks()
     {
         SequenceRewriter<char> rewriter = new() {

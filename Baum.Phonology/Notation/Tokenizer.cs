@@ -52,6 +52,12 @@ record Comma : Token
     public static readonly Comma Default = new();
 }
 
+record EndToken : Token
+{
+    private EndToken() { }
+    public static readonly EndToken Default = new();
+} 
+
 record PositiveFeature(Feature Feature) : Token;
 record NegativeFeature(Feature Feature) : Token;
 
@@ -109,6 +115,7 @@ class SoundEnumerator : IEnumerator<Token>
                 case '{': ++_pos; _current = OpenBrace.Default; return true;
                 case '}': ++_pos; _current = CloseBrace.Default; return true;
                 case ',': ++_pos; _current = Comma.Default; return true;
+                case '#': ++_pos; _current = EndToken.Default; return true;
                 case '+':
                     ++_pos;
                     _current = new PositiveFeature(NextFeature());

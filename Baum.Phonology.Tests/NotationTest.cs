@@ -112,4 +112,12 @@ public class NotationTest
         Assert.True(SoundChange.TryApply(initial, rule, stubData, out var result));
         Assert.Equal(expected, result);
     }
+
+    [Theory]
+    [InlineData("e > {} / _#", "peme", "pem")]
+    public void WordEndPostCondition(string rule, string initial, string expected)
+    {
+        Assert.True(SoundChange.TryApply(initial, rule, stubData, out var result));
+        Assert.Equal(expected, result);
+    }
 }

@@ -25,3 +25,8 @@ public record EmptyNode : MatchNode
 {
     public override T Accept<T>(IMatchNodeVisitor<T> visitor) => visitor.Visit(this);
 }
+
+public record EndMatchNode : MatchNode
+{
+    public override T Accept<T>(IMatchNodeVisitor<T> visitor) => visitor.Visit(this);
+}

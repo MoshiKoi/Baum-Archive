@@ -31,18 +31,20 @@ public ref struct NotationParser
         if (_isValid)
         {
             Consume<Slash>();
-            return ParseCondition(rewriter);
+            rewriter = ParseCondition(rewriter);
         }
-        else
-        {
-            return rewriter;
-        }
+
+        if (_isValid)
+            throw new Exception("Incomplete parse: There are still tokens left, but it couln't be parsed");
+
+        return rewriter;
+
     }
 
     List<MatchNode> NextMatchSequence()
     {
         List<MatchNode> matchNodes = new();
-        while (_isValid && _tokens.Current is SoundToken or OpenBracket or OpenBrace)
+        while (_isValid && _tokens.Current is SoundToken or OpenBracket or OpenBrace or EndToken)
         {
             matchNodes.Add(NextMatchNode());
         }
@@ -52,6 +54,7 @@ public ref struct NotationParser
     // MatchNode : IPASymbol
     //           | FeatureSet
     //           | List
+    //           | End
     MatchNode NextMatchNode()
     {
         switch (CurrentToken)
@@ -59,6 +62,9 @@ public ref struct NotationParser
             case SoundToken { Features: var features }:
                 Advance();
                 return new SoundMatchNode(features);
+            case EndToken:
+                Advance();
+                return new EndMatchNode();
             case OpenBracket:
                 return NextFeatureSet();
             case OpenBrace:
