@@ -26,7 +26,7 @@ public class LanguageForestViewModel : ViewModelBase
         LanguageTrees = new();
         AddLanguageCommand = ReactiveCommand.CreateFromTask(async () =>
         {
-            await database.AddAsync(new LanguageModel { Name = "Unnamed Language" });
+            await database.AddAsync(new LanguageModel("Unnamed Language"));
             await LoadAsync();
         });
     }

@@ -2,7 +2,6 @@ using System.Collections.ObjectModel;
 using System.Reactive;
 using System.Threading.Tasks;
 using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 
 using Baum.AvaloniaApp.Models;
 using Baum.AvaloniaApp.Services;
@@ -11,10 +10,9 @@ namespace Baum.AvaloniaApp.ViewModels;
 
 public class LanguageTreeViewModel : ViewModelBase
 {
-    [Reactive]
-    LanguageModel Language { get; set; }
+    LanguageModel _language;
+    LanguageModel Language { get => _language; set => this.RaiseAndSetIfChanged(ref _language, value); }
 
-    [Reactive]
     ObservableCollection<LanguageTreeViewModel> Children { get; set; }
 
     string DecendedFromMessage { get; } = "Decended From:";
@@ -29,7 +27,7 @@ public class LanguageTreeViewModel : ViewModelBase
         ReactiveCommand<LanguageModel, Unit> openLanguageCommand,
         IProjectDatabase database)
     {
-        Language = language;
+        _language = language;
         Children = new();
 
         Database = database;
@@ -37,11 +35,7 @@ public class LanguageTreeViewModel : ViewModelBase
         OpenLanguageCommand = openLanguageCommand;
         AddChildCommand = ReactiveCommand.CreateFromTask(async () =>
         {
-            await Database.AddAsync(new LanguageModel
-            {
-                ParentId = Language.Id,
-                Name = "Unnamed Language"
-            });
+            await Database.AddAsync(new LanguageModel("Unnamed Language") { Id = Language.Id});
             await LoadAsync();
         });
     }

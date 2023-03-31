@@ -7,7 +7,6 @@ using System.Reactive.Linq;
 using Avalonia;
 using Avalonia.Platform;
 using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 
 using Baum.AvaloniaApp.Services;
 
@@ -15,8 +14,8 @@ namespace Baum.AvaloniaApp.ViewModels;
 
 public class MainWindowViewModel : ViewModelBase
 {
-    [Reactive]
-    public ViewModelBase Content { get; set; }
+    ViewModelBase _content;
+    public ViewModelBase Content { get => _content; set => this.RaiseAndSetIfChanged(ref _content, value); }
 
     public Interaction<Unit, FileInfo?> RequestFileInteraction { get; }
     public Interaction<Unit, FileInfo?> RequestSaveFileInteraction { get; }
@@ -26,7 +25,7 @@ public class MainWindowViewModel : ViewModelBase
 
     public MainWindowViewModel(IProjectDatabaseFactory databaseFactory)
     {
-        Content = new HomeViewModel(
+        _content = new HomeViewModel(
             ReactiveCommand.CreateFromTask(OpenFileAsync),
             ReactiveCommand.CreateFromTask(NewFileAsync));
 

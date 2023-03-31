@@ -3,7 +3,6 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 
 using Baum.Phonology;
 
@@ -18,8 +17,8 @@ public class ProjectViewModel : ViewModelBase
     IProjectDatabase Database { get; }
     FileInfo? SaveFileInfo { get; set; }
 
-    [Reactive]
-    public ViewModelBase? Content { get; set; }
+    ViewModelBase? _content;
+    public ViewModelBase? Content { get => _content; set => this.RaiseAndSetIfChanged(ref _content, value); }
 
     public ReactiveCommand<Unit, Unit> OpenLanguageForestCommand { get; }
     public ReactiveCommand<LanguageModel, Unit> OpenLanguageCommand { get; }

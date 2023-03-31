@@ -3,7 +3,6 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 
 using Baum.Phonology;
 
@@ -17,30 +16,28 @@ public class LanguageViewModel : ViewModelBase
     PhonologyData Data { get; set; }
     IProjectDatabase Database { get; set; }
 
-    [Reactive]
-    public LanguageModel Language { get; set; }
+    LanguageModel _languageModel;
+    public LanguageModel Language { get => _languageModel; set => this.RaiseAndSetIfChanged(ref _languageModel, value); }
 
     public ObservableCollection<WordViewModel> Words { get; }
 
-    [Reactive]
-    public WordViewModel? CurrentWord { get; set; }
+    WordViewModel? _currentWord;
+    public WordViewModel? CurrentWord { get => _currentWord; set => this.RaiseAndSetIfChanged(ref _currentWord, value); }
 
     public ReactiveCommand<Unit, Unit> AddWordCommand { get; }
     public ReactiveCommand<LanguageModel, Unit> SaveCommand { get; }
 
     public LanguageViewModel(LanguageModel language, IProjectDatabase database, PhonologyData data)
     {
-        Language = language;
+        _languageModel = language;
         Words = new();
         Database = database;
         Data = data;
         AddWordCommand = ReactiveCommand.CreateFromTask(async () =>
         {
-            await Database.AddAsync(new WordModel
+            await Database.AddAsync(new WordModel("New Word", "")
             {
                 Transient = false,
-                Name = "New Word",
-                IPA = "",
                 LanguageId = Language.Id
             });
             await LoadAsync();

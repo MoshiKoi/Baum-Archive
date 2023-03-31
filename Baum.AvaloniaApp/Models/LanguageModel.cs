@@ -1,17 +1,21 @@
+using System.Diagnostics.CodeAnalysis;
 using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 
 namespace Baum.AvaloniaApp.Models;
 
 public class LanguageModel : ReactiveObject
 {
+    public LanguageModel(string? name, int? parentId = null, string soundChange = "")
+        => (_name, _parentId, _soundChange) = (name, parentId, soundChange);
+
     public int Id { get; set; }
 
-    [Reactive]
-    public string? Name { get; set; }
+    string? _name;
+    public string? Name { get => _name; set => this.RaiseAndSetIfChanged(ref _name, value); }
 
-    public int? ParentId { get; set; }
+    int? _parentId;
+    public int? ParentId { get => _parentId; set => this.RaiseAndSetIfChanged(ref _parentId, value); }
 
-    [Reactive]
-    public string SoundChange { get; set; } = "";
+    string _soundChange;
+    public string SoundChange { get => _soundChange; set => this.RaiseAndSetIfChanged(ref _soundChange, value); }
 }

@@ -3,7 +3,6 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Linq;
 using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 
 using Baum.Phonology;
 
@@ -14,8 +13,10 @@ namespace Baum.AvaloniaApp.ViewModels;
 
 public class WordViewModel : ViewModelBase
 {
-    [Reactive]
-    public WordModel Word { get; set; }
+    IProjectDatabase Database { get; }
+
+    WordModel _wordModel;
+    public WordModel Word { get => _wordModel; set => this.RaiseAndSetIfChanged(ref _wordModel, value); }
 
     public ObservableCollection<WordModel> Ancestry { get; set; }
 
@@ -23,7 +24,7 @@ public class WordViewModel : ViewModelBase
 
     public WordViewModel(WordModel word, IProjectDatabase database, PhonologyData data)
     {
-        Word = word;
+        _wordModel = word;
         Ancestry = new();
         Database = database;
 
@@ -53,6 +54,4 @@ public class WordViewModel : ViewModelBase
                 }
             }));
     }
-
-    IProjectDatabase Database { get; }
 }

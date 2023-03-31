@@ -54,26 +54,19 @@ class ProjectDatabase : IProjectDatabase
         return await (
             from language in context.Languages
             where language.ParentId == languageId
-            select new LanguageModel
-            {
-                Id = language.Id,
-                Name = language.Name,
-                ParentId = language.ParentId,
-                SoundChange = language.SoundChange,
-            }).ToArrayAsync();
+            select new LanguageModel(
+                language.Name,
+                language.ParentId,
+                language.SoundChange) { Id = language.Id }).ToArrayAsync();
     }
 
     public async Task<IEnumerable<LanguageModel>> GetLanguagesAsync()
     {
         using var context = new ProjectContext(File);
 
-        return await context.Languages.Select(l => new LanguageModel
-        {
-            Id = l.Id,
-            Name = l.Name,
-            ParentId = l.ParentId,
-            SoundChange = l.SoundChange,
-        }).ToArrayAsync();
+        return await context.Languages
+            .Select(l => new LanguageModel(l.Name,l.ParentId,l.SoundChange) { Id = l.Id })
+            .ToArrayAsync();
     }
 
     async Task<WordModel> GetWordAsync(int wordId)
@@ -83,12 +76,10 @@ class ProjectDatabase : IProjectDatabase
         var word = await context.Words.FindAsync(wordId);
         if (word == null) throw new InvalidOperationException("Word doesn't exist");
 
-        return new WordModel
+        return new WordModel(word.Name, word.IPA)
         {
             Transient = false,
             Id = word.Id,
-            Name = word.Name,
-            IPA = word.IPA,
             AncestorId = word.AncestorId,
             LanguageId = word.LanguageId,
         };
@@ -106,12 +97,10 @@ class ProjectDatabase : IProjectDatabase
 
         await foreach (var word in context.Entry(language).Collection(l => l.Words).Query().AsAsyncEnumerable())
         {
-            words.Add(new WordModel
+            words.Add(new WordModel(word.Name, word.IPA)
             {
                 Transient = false,
                 Id = word.Id,
-                Name = word.Name,
-                IPA = word.IPA,
                 AncestorId = word.AncestorId,
                 LanguageId = word.LanguageId,
             });
@@ -124,13 +113,11 @@ class ProjectDatabase : IProjectDatabase
             {
                 SoundChange.TryApply(parentWord.IPA, language.SoundChange, data, out var IPA);
 
-                words.Add(new WordModel
+                words.Add(new WordModel(parentWord.Name, IPA)
                 {
                     Transient = true,
                     LanguageId = languageId,
-                    AncestorId = parentWord.Transient ? parentWord.AncestorId : parentWord.Id,
-                    Name = parentWord.Name,
-                    IPA = IPA
+                    AncestorId = parentWord.Transient ? parentWord.AncestorId : parentWord.Id
                 });
             }
         }
@@ -174,13 +161,11 @@ class ProjectDatabase : IProjectDatabase
         }
 
         List<WordModel> wordChain = new();
-        wordChain.Add(new()
+        wordChain.Add(new(ancester.Name, ancester.IPA)
         {
             Transient = false,
             AncestorId = ancester.AncestorId,
             LanguageId = ancester.LanguageId,
-            Name = ancester.Name,
-            IPA = ancester.IPA
         });
 
         foreach (Language intermediate in Enumerable.Reverse(languageChain))
@@ -191,13 +176,11 @@ class ProjectDatabase : IProjectDatabase
 
             // TODO? Possibly do some error handling or notification here instead of just skipping
             if (last.IPA == next) continue;
-            wordChain.Add(new WordModel
+            wordChain.Add(new WordModel(last.Name, next)
             {
                 Transient = true,
                 AncestorId = ancester.Id,
-                LanguageId = intermediate.Id,
-                Name = last.Name,
-                IPA = next,
+                LanguageId = intermediate.Id
             });
         }
 
