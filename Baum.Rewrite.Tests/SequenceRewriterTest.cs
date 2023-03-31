@@ -17,6 +17,20 @@ public class SequenceRewriterTest
     }
 
     [Fact]
+    public void InsertionAtEndWorks()
+    {
+        SequenceRewriter<char> rewriter = new() {
+            new MatchRewriter<char>('a'),
+            new MatchRewriter<char>('b'),
+            new EndRewriter<char>("c")
+        };
+
+        var result = string.Concat(rewriter.Rewrite("ab", 0).First().Rewrite);
+
+        Assert.Equal("abc", result);
+    }
+
+    [Fact]
     public void InsertionInBetweenMatchesWorks()
     {
         SequenceRewriter<char> rewriter = new() {
