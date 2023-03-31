@@ -107,7 +107,7 @@ public ref struct NotationParser
         List<MatchNode> nodes = new();
         while (true)
         {
-            if (CurrentToken is SoundToken or OpenBracket or OpenBrace)
+            if (CurrentToken is SoundToken or OpenBracket or OpenBrace or EndToken)
             {
                 nodes.Add(NextMatchNode());
             }

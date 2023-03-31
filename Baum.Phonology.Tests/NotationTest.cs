@@ -116,6 +116,15 @@ public class NotationTest
         Assert.True(SoundChange.TryApply(initial, rule, stubData, out var result));
         Assert.Equal(expected, result);
     }
+    
+    [Theory]
+    [InlineData("p > b / _{a,e}", "papepm", "babepm")]
+    [InlineData("p > b / _{e,#}", "pep", "beb")]
+    public void BracedListCondition(string rule, string initial, string expected)
+    {
+        Assert.True(SoundChange.TryApply(initial, rule, stubData, out var result));
+        Assert.Equal(expected, result);
+    }
 
     [Theory]
     [InlineData("e > {} / _#", "peme", "pem")]
