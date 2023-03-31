@@ -25,6 +25,8 @@ public class NotationTest
     [Theory]
     [InlineData("p > b / a_", "pape", "pabe")]
     [InlineData("p > b / a_", "pamap", "pamab")]
+    [InlineData("a > e / [-voiced]_", "pap", "pep")]
+    [InlineData("a > e / [-voiced]_", "map", "map")]
     public void PreconditionNotationPasses(string rule, string initial, string expected)
     {
         Assert.True(SoundChange.TryApply(initial, rule, stubData, out var result));
@@ -34,6 +36,8 @@ public class NotationTest
     [Theory]
     [InlineData("p > b / _a", "pape", "bape")]
     [InlineData("p > b / _a", "pamap", "bamap")]
+    [InlineData("a > e / _[-voiced]", "pap", "pep")]
+    [InlineData("a > e / _[-voiced]", "pam", "pam")]
     public void PostconditionNotationPasses(string rule, string initial, string expected)
     {
         Assert.True(SoundChange.TryApply(initial, rule, stubData, out var result));
