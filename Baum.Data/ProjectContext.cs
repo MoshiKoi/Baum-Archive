@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Data.Sqlite;
 
-namespace Baum.AvaloniaApp.Services.Database;
+namespace Baum.Data;
 
 public class ProjectContext : DbContext
 {

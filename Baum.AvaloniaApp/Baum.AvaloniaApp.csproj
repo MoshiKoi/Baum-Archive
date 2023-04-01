@@ -24,11 +24,6 @@
     <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
     <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="0.10.19" />
     <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.19" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.4">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.4" />
     <PackageReference Include="PolySharp" Version="1.12.1">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
@@ -38,5 +33,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Baum.Phonology\Baum.Phonology.csproj" />
+    <ProjectReference Include="..\Baum.Data\Baum.Data.csproj" />
   </ItemGroup>
 </Project>

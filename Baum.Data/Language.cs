@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Baum.AvaloniaApp.Services.Database;
+namespace Baum.Data;
 
 public class Language
 {
