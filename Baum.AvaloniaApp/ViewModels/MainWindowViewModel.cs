@@ -17,6 +17,7 @@ public class MainWindowViewModel : ViewModelBase
     ViewModelBase _content;
     public ViewModelBase Content { get => _content; set => this.RaiseAndSetIfChanged(ref _content, value); }
 
+    public Interaction<Unit, bool> ConfirmMigrationInteraction { get; }
     public Interaction<Unit, FileInfo?> RequestFileInteraction { get; }
     public Interaction<Unit, FileInfo?> RequestSaveFileInteraction { get; }
     public Interaction<Unit, FileInfo> RequestTemporaryFileInteraction { get; }
@@ -29,6 +30,7 @@ public class MainWindowViewModel : ViewModelBase
             ReactiveCommand.CreateFromTask(OpenFileAsync),
             ReactiveCommand.CreateFromTask(NewFileAsync));
 
+        ConfirmMigrationInteraction = new();
         RequestFileInteraction = new();
         RequestSaveFileInteraction = new();
         RequestTemporaryFileInteraction = new();
@@ -45,14 +47,18 @@ public class MainWindowViewModel : ViewModelBase
             // var tempFile = await RequestTemporaryFileInteraction.Handle(Unit.Default);
             // file.CopyTo(tempFile.FullName, true);
             var tempFile = file;
-            await OpenAsync(await GetDatabase(tempFile), file);
+            var database = await GetDatabase(tempFile);
+            if (database != null)
+                await OpenAsync(database, file);
         }
     }
 
     async Task NewFileAsync()
     {
         var file = await RequestTemporaryFileInteraction.Handle(Unit.Default);
-        await OpenAsync(await GetDatabase(file), null);
+        var database = await GetDatabase(file);
+        if (database != null)
+            await OpenAsync(database, null);
     }
 
     async Task OpenAsync(IProjectDatabase database, FileInfo? file)
@@ -82,11 +88,14 @@ public class MainWindowViewModel : ViewModelBase
         Content = vm;
     }
 
-    async Task<IProjectDatabase> GetDatabase(FileInfo file)
+    async Task<IProjectDatabase?> GetDatabase(FileInfo file)
     {
         var database = DatabaseFactory.Create(file);
         if (database.HasMigrations())
         {
+            if (!await ConfirmMigrationInteraction.Handle(Unit.Default))
+                return null;
+
             await database.MigrateAsync();
         }
         return database;

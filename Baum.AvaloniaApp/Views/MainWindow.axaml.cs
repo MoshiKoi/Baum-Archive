@@ -17,10 +17,20 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
 
         this.WhenActivated(d =>
         {
-            ViewModel!.RequestFileInteraction.RegisterHandler(ShowOpenFileDialog);
-            ViewModel.RequestSaveFileInteraction.RegisterHandler(ShowSaveFileDialog);
-            ViewModel.RequestTemporaryFileInteraction.RegisterHandler(GetTemporaryFile);
+            d(ViewModel!.RequestFileInteraction.RegisterHandler(ShowOpenFileDialog));
+            d(ViewModel.RequestSaveFileInteraction.RegisterHandler(ShowSaveFileDialog));
+            d(ViewModel.RequestTemporaryFileInteraction.RegisterHandler(GetTemporaryFile));
+            d(ViewModel.ConfirmMigrationInteraction.RegisterHandler(ShowMigrationConfirmationDialog));
         });
+    }
+
+    async Task ShowMigrationConfirmationDialog(InteractionContext<Unit, bool> interaction)
+    {
+        var dialog = new MigrationConfirmationWindow();
+        dialog.DataContext = new MigrationConfirmationWindowViewModel();
+
+        var result = await dialog.ShowDialog<bool?>(this);
+        interaction.SetOutput(result ?? false);
     }
 
     public void GetTemporaryFile(InteractionContext<Unit, FileInfo> interaction)
@@ -70,7 +80,8 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
         {
             interaction.SetOutput(new FileInfo(saveFile));
         }
-        else {
+        else
+        {
             interaction.SetOutput(null);
         }
     }
